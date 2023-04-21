@@ -205,6 +205,8 @@ const MenuContainer = styled.div`
   width: 200px;
 `;
 
+const Menu = styled.div``;
+
 // =============================================================================
 // Typedefs
 // =============================================================================
@@ -229,14 +231,16 @@ const Sidebar = React.memo((props: Props) => {
   return (
     <Main>
       <Body>
-        <MenuButton onClick={toggleMenu}>Sandboxes</MenuButton>
-          {menuOpen && (
-            <MenuContainer>
-              <NavigationLink to="/sol-sandbox">Solana Sandbox</NavigationLink>
-              <NavigationLink to="/eth-sandbox">Ethereum Sandbox</NavigationLink>
-              <NavigationLink to="/multi-chain-sandbox">Multi-Chain Sandbox</NavigationLink>
-            </MenuContainer>
-          )}
+        <Menu>
+          <MenuButton onClick={toggleMenu}>Sandboxes</MenuButton>
+            {menuOpen && (
+              <MenuContainer>
+                <NavigationLink to="/sol-sandbox">Solana Sandbox</NavigationLink>
+                <NavigationLink to="/eth-sandbox">Ethereum Sandbox</NavigationLink>
+                <NavigationLink to="/multi-chain-sandbox">Multi-Chain Sandbox</NavigationLink>
+              </MenuContainer>
+            )}
+        </Menu>
         <Link>
           <img src='https://phantom.app/img/phantom-logo.svg' alt='Phantom' width='200' />
           <Subtitle>Multi-chain Sandbox</Subtitle>
