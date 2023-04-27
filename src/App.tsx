@@ -4,6 +4,7 @@ import { SolSandbox } from './sandboxes/sol-sandbox';
 import { EthSandbox } from './sandboxes/eth-sandbox';
 import { MultiChainSandbox } from './sandboxes/multi-chain-sandbox';
 import { SolAdapterSandbox } from './sandboxes/adapter-sandbox';
+import { ExperimentalSandbox } from './sandboxes/experimental-sandbox';
 
 function App() {
   return (
@@ -14,6 +15,7 @@ function App() {
         <Route path="/eth-sandbox" element={<EthSandbox />} />
         <Route path="/multi-chain-sandbox" element={<MultiChainSandbox />} />
         <Route path="/sol-adapter-sandbox" element={<SolAdapterSandbox />} />
+        <Route path="/experimental-sandbox" element={<ExperimentalSandbox />} />
       </Routes>
     </Router>
   );
