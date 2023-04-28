@@ -23,6 +23,8 @@ const Main = styled.main`
   padding: 20px;
   align-items: center;
   background-color: ${REACT_GRAY};
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
   > * {
     margin-bottom: 10px;
   }

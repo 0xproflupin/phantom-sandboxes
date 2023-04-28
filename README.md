@@ -1,4 +1,15 @@
-# Getting Started with Create React App
+# Phantom Sandbox
+
+The all-in-one Phantom Mult-Chain Sandbox. This react app contains the following sandboxes:
+
+1. Solana
+2. Ethereum
+3. Multi-Chain
+4. Solana Wallet Adapter
+5. Solana Deeplinks
+6. Mobile Wallet Adapter
+
+
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
