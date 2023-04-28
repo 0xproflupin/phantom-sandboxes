@@ -21,7 +21,7 @@ import {
   signTransaction,
 } from './utils';
 
-import { TLog } from './types';
+import { PhantomProvider, TLog } from './types';
 
 import { Logs, Sidebar } from './components';
 
@@ -44,9 +44,9 @@ const StyledApp = styled.div`
 
 // NB: This URL will only work for Phantom sandbox apps! Please do not use this for your project.
 const NETWORK = 'https://rpc.helius.xyz/?api-key=402f3e20-991a-4e36-9e2b-5f3d375aaec0';
-const provider = getProvider();
 const connection = new Connection(NETWORK);
 const message = 'To avoid digital dognappers, sign below to authenticate with CryptoCorgis.';
+const sleep = (timeInMS) => new Promise((resolve) => setTimeout(resolve, timeInMS));
 
 // =============================================================================
 // Typedefs
@@ -79,7 +79,8 @@ interface Props {
  * The fun stuff!
  */
 const useProps = (): Props => {
-  const [logs, setLogs] = useState<TLog[]>([]);
+  const [provider, setProvider] = useState<PhantomProvider | null>(null);
+  const [logs, setLogs] = useState<TLog[]>([]); 
 
   const createLog = useCallback(
     (log: TLog) => {
@@ -92,6 +93,14 @@ const useProps = (): Props => {
     setLogs([]);
   }, [setLogs]);
 
+  useEffect(() => {
+    (async () => {
+      // sleep for 100 ms to give time to inject
+      await sleep(100);
+      setProvider(getProvider());
+    })();
+  }, []);
+  
   useEffect(() => {
     if (!provider) return;
 
@@ -158,7 +167,7 @@ const useProps = (): Props => {
     return () => {
       provider.disconnect();
     };
-  }, [createLog]);
+  }, [createLog, provider]);
 
   /** SignAndSendTransaction */
   const handleSignAndSendTransaction = useCallback(async () => {
@@ -185,7 +194,7 @@ const useProps = (): Props => {
         message: error.message,
       });
     }
-  }, [createLog]);
+  }, [createLog, provider]);
 
   /** SignAndSendTransactionV0 */
   const handleSignAndSendTransactionV0 = useCallback(async () => {
@@ -212,7 +221,7 @@ const useProps = (): Props => {
         message: error.message,
       });
     }
-  }, [createLog]);
+  }, [createLog, provider]);
 
   /** SignAndSendTransactionV0WithLookupTable */
   const handleSignAndSendTransactionV0WithLookupTable = useCallback(async () => {
@@ -263,7 +272,7 @@ const useProps = (): Props => {
         message: error.message,
       });
     }
-  }, [createLog]);
+  }, [createLog, provider]);
 
   /** SignTransaction */
   const handleSignTransaction = useCallback(async () => {
@@ -289,7 +298,7 @@ const useProps = (): Props => {
         message: error.message,
       });
     }
-  }, [createLog]);
+  }, [createLog, provider]);
 
   /** SignAllTransactions */
   const handleSignAllTransactions = useCallback(async () => {
@@ -318,7 +327,7 @@ const useProps = (): Props => {
         message: error.message,
       });
     }
-  }, [createLog]);
+  }, [createLog, provider]);
 
   /** SignMessage */
   const handleSignMessage = useCallback(async () => {
@@ -339,7 +348,7 @@ const useProps = (): Props => {
         message: error.message,
       });
     }
-  }, [createLog]);
+  }, [createLog, provider]);
 
   /** Connect */
   const handleConnect = useCallback(async () => {
@@ -354,7 +363,7 @@ const useProps = (): Props => {
         message: error.message,
       });
     }
-  }, [createLog]);
+  }, [createLog, provider]);
 
   /** Disconnect */
   const handleDisconnect = useCallback(async () => {
@@ -369,7 +378,7 @@ const useProps = (): Props => {
         message: error.message,
       });
     }
-  }, [createLog]);
+  }, [createLog, provider]);
 
   const connectedMethods = useMemo(() => {
     return [
