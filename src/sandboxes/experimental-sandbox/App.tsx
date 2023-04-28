@@ -5,7 +5,7 @@
  */
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import styled from 'styled-components';
-import { Connection, PublicKey } from '@solana/web3.js';
+import { PublicKey } from '@solana/web3.js';
 
 import {
   createSignInData,
@@ -16,7 +16,7 @@ import {
 
 import { TLog } from './types';
 
-import { Logs, Sidebar, NoProvider } from './components';
+import { Logs, Sidebar } from './components';
 
 // =============================================================================
 // Styled Components
@@ -36,9 +36,7 @@ const StyledApp = styled.div`
 // =============================================================================
 
 // NB: This URL will only work for Phantom sandbox apps! Please do not use this for your project.
-const NETWORK = 'https://rpc.helius.xyz/?api-key=402f3e20-991a-4e36-9e2b-5f3d375aaec0';
 const provider = getProvider();
-const connection = new Connection(NETWORK);
 const message = 'To avoid digital dognappers, sign below to authenticate with CryptoCorgis.';
 
 // =============================================================================
@@ -276,10 +274,6 @@ const StatelessApp = React.memo((props: Props) => {
 
 const App = () => {
   const props = useProps();
-
-  if (!provider) {
-    return <NoProvider />;
-  }
 
   return <StatelessApp {...props} />;
 };

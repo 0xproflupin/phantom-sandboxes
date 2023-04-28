@@ -21,7 +21,7 @@ import {
 
 import { PhantomInjectedProvider, SupportedEVMChainIds, TLog } from './types';
 
-import { Logs, NoProvider, Sidebar } from './components';
+import { Logs, Sidebar } from './components';
 import { connect, silentlyConnect } from './utils/connect';
 import { setupEvents } from './utils/setupEvents';
 import { ensureEthereumChain } from './utils/ensureEthereumChain';
@@ -46,7 +46,7 @@ const StyledApp = styled.div`
 // =============================================================================
 
 // NB: This URL will only work for Phantom sandbox apps! Please do not use this for your project. If you are running this locally we recommend using one of Solana's public RPC endpoints
-const solanaNetwork = 'https://phantom-phantom-f0ad.mainnet.rpcpool.com/';
+const solanaNetwork = 'https://rpc.helius.xyz/?api-key=402f3e20-991a-4e36-9e2b-5f3d375aaec0';
 const connection = new Connection(solanaNetwork);
 const message = 'To avoid digital dognappers, sign below to authenticate with CryptoCorgis.';
 
@@ -363,10 +363,6 @@ const App = () => {
     };
     getPhantomMultiChainProvider();
   }, []);
-
-  if (!provider) {
-    return <NoProvider />;
-  }
 
   return <StatelessApp {...props} />;
 };

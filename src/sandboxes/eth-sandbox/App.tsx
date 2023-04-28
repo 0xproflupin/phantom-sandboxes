@@ -10,7 +10,7 @@ import { getProvider, sendTransaction } from './utils';
 
 import { TLog, Web3Provider } from './types';
 
-import { Logs, Sidebar, NoProvider } from './components';
+import { Logs, Sidebar } from './components';
 
 // =============================================================================
 // Styled Components
@@ -284,10 +284,6 @@ const StatelessApp = React.memo((props: Props) => {
 
 const App = () => {
   const props = useProps();
-
-  if (!props.provider) {
-    return <NoProvider />;
-  }
 
   return <StatelessApp {...props} />;
 };

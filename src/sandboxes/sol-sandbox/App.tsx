@@ -23,7 +23,7 @@ import {
 
 import { TLog } from './types';
 
-import { Logs, Sidebar, NoProvider } from './components';
+import { Logs, Sidebar } from './components';
 
 // =============================================================================
 // Styled Components
@@ -442,10 +442,6 @@ const StatelessApp = React.memo((props: Props) => {
 
 const App = () => {
   const props = useProps();
-
-  if (!provider) {
-    return <NoProvider />;
-  }
 
   return <StatelessApp {...props} />;
 };
