@@ -78,6 +78,7 @@ export interface TLog {
   providerType: PhantomProviderType;
   status: Status;
   method?: PhantomRequestMethod | Extract<PhantomEvent, 'accountChanged' | 'accountsChanged' | 'chainChanged'>;
+  confirmation?: {signature: string, link: string};
   message: string;
   messageTwo?: string;
 }

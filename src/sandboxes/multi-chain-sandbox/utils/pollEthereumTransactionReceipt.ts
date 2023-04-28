@@ -76,6 +76,10 @@ const pollEthereumTransactionReceipt = async (
         status: 'success',
         method: 'eth_sendTransaction',
         message: `Transaction: ${txHash}`,
+        confirmation: {
+          signature: txHash,
+          link: `https://etherscan.io/tx/${txHash}`,
+        },
         messageTwo: `Status: Confirmed in block: ${parseInt(blockNumber)}`,
       });
       clearInterval(interval);

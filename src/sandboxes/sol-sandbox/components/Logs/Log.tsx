@@ -59,7 +59,18 @@ const Log = React.memo((props: TLog) => (
       </StyledSpan>
       {props.method && <Method>[{props.method}]</Method>}
     </Row>
-    <Message>{props.message}</Message>
+    <Message>
+      {props.confirmation ? (
+        <>
+          {props.message}
+          <a href={props.confirmation.link} target="_blank" rel="noopener noreferrer">
+            {props.confirmation.signature}
+          </a>
+        </>
+      ) : (
+        props.message
+      )}
+    </Message>
     {props.messageTwo && <Message>{props.messageTwo}</Message>}
   </Column>
 ));

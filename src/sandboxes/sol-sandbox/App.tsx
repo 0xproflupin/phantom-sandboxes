@@ -229,6 +229,7 @@ const useProps = (): Props => {
         method: 'signAndSendTransactionV0WithLookupTable',
         message: `Signed and submitted transactionV0 to make an Address Lookup Table ${lookupTableAddress} with signature: ${lookupSignature}. Please wait for 5-7 seconds after signing the next transaction to be able to see the next transaction popup. This time is needed as newly appended addresses require one slot to warmup before being available to transactions for lookups.`,
       });
+      pollSignatureStatus(lookupSignature, connection, createLog);
       const extensionSignature = await extendAddressLookupTable(
         provider,
         provider.publicKey,
@@ -241,7 +242,7 @@ const useProps = (): Props => {
         method: 'signAndSendTransactionV0WithLookupTable',
         message: `Signed and submitted transactionV0 to extend Address Lookup Table ${extensionSignature}.`,
       });
-
+      pollSignatureStatus(extensionSignature, connection, createLog);
       const signature = await signAndSendTransactionV0WithLookupTable(
         provider,
         provider.publicKey,

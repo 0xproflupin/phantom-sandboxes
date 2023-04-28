@@ -42,5 +42,6 @@ export interface TLog {
   status: Status;
   method?: PhantomRequestMethod | Extract<PhantomEvent, 'accountChanged'>;
   message: string;
+  confirmation?: {signature: string, link: string};
   messageTwo?: string;
 }

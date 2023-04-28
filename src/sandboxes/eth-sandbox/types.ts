@@ -14,6 +14,7 @@ export type Status = 'success' | 'warning' | 'error' | 'info';
 export interface TLog {
   status: Status;
   method?: PhantomRequestMethod | Extract<PhantomEvent, 'accountChanged'>;
+  confirmation?: {signature: string, link: string};
   message: string;
   messageTwo?: string;
 }

@@ -171,6 +171,10 @@ const useProps = (): Props => {
           status: 'success',
           method: 'eth_sendTransaction',
           message: `TX included: ${JSON.stringify(txReceipt)}`,
+          confirmation: {
+            signature: `${JSON.stringify(txReceipt)}`,
+            link: `https://etherscan.io/tx/${JSON.stringify(txReceipt)}`,
+          },
         });
       } catch (error) {
         // log out if the tx didn't get included for some reason

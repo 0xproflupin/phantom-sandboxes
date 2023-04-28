@@ -12,7 +12,7 @@ const MAX_POLLS = 30;
  * @param   {Function}   createLog  a function to create log
  * @returns
  */
-const pollSolanaSignatureStatus = async (
+const pollSignatureStatus = async (
   signature: string,
   connection: Connection,
   createLog: (log: TLog) => void
@@ -43,7 +43,11 @@ const pollSolanaSignatureStatus = async (
         providerType: 'solana',
         status: hasReachedSufficientCommitment ? 'success' : 'info',
         method: 'signAndSendTransaction',
-        message: `Transaction: ${signature}`,
+        message: `Transaction: `,
+        confirmation: {
+          signature,
+          link: `https://solscan.io/tx/${signature}`,
+        },
         messageTwo: `Status: ${confirmationStatus.charAt(0).toUpperCase() + confirmationStatus.slice(1)}`,
       });
 
@@ -65,4 +69,4 @@ const pollSolanaSignatureStatus = async (
   }, POLLING_INTERVAL);
 };
 
-export default pollSolanaSignatureStatus;
+export default pollSignatureStatus;

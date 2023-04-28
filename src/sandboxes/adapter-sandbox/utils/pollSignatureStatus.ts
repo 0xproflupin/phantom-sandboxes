@@ -41,7 +41,11 @@ const pollSignatureStatus = async (
       createLog({
         status: hasReachedSufficientCommitment ? 'success' : 'info',
         method: 'signAndSendTransaction',
-        message: `Transaction: ${signature}`,
+        message: `Transaction: `,
+        confirmation: {
+          signature,
+          link: `https://solscan.io/tx/${signature}`,
+        },
         messageTwo: `Status: ${confirmationStatus.charAt(0).toUpperCase() + confirmationStatus.slice(1)}`,
       });
 
