@@ -3,14 +3,42 @@
  * This will trigger a re-install of the dependencies in the sandbox – which should fix things right up.
  * Alternatively, you can fork this sandbox to refresh the dependencies manually.
  */
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import styled from 'styled-components';
+import '@rainbow-me/rainbowkit/styles.css';
+import { connectorsForWallets, RainbowKitProvider, darkTheme } from '@rainbow-me/rainbowkit';
+import { phantomWallet, injectedWallet } from '@rainbow-me/rainbowkit/wallets'
+import { configureChains, createClient, goerli, WagmiConfig, useAccount, useSignMessage } from 'wagmi';
+import { publicProvider } from 'wagmi/providers/public';
 
 import { getProvider, sendTransaction } from './utils';
 
 import { TLog, Web3Provider } from './types';
 
 import { Logs, Sidebar } from './components';
+
+// =============================================================================
+// Rainbowkit Configuration
+// =============================================================================
+// initalize which chains your dapp will use, and set up a provider
+const { chains, provider } = configureChains(
+  [goerli],
+  [publicProvider()]
+)
+const connectors = connectorsForWallets([
+  {
+    groupName: 'The Best',
+    wallets: [
+      phantomWallet({ chains }),
+      injectedWallet({ chains })
+    ]
+  }
+])
+
+const wagmiClient = createClient({
+  connectors,
+  provider
+})
 
 // =============================================================================
 // Styled Components
@@ -29,12 +57,6 @@ const StyledApp = styled.div`
 // Constants
 // =============================================================================
 
-declare global {
-  interface Window {
-    ethereum: any
-  }
-}
-let accounts = [];
 const message = 'To avoid digital dognappers, sign below to authenticate with CryptoCorgis.';
 const sleep = (timeInMS) => new Promise((resolve) => setTimeout(resolve, timeInMS));
 
@@ -45,7 +67,7 @@ const sleep = (timeInMS) => new Promise((resolve) => setTimeout(resolve, timeInM
 export type ConnectedMethods =
   | {
       name: string;
-      onClick: () => Promise<string>;
+      onClick:() => void;
     }
   | {
       name: string;
@@ -55,7 +77,6 @@ export type ConnectedMethods =
 interface Props {
   address: string | null;
   connectedMethods: ConnectedMethods[];
-  handleConnect: () => Promise<void>;
   provider: Web3Provider;
   logs: TLog[];
   clearLogs: () => void;
@@ -92,65 +113,23 @@ const useProps = (): Props => {
     })();
   }, []);
 
-  useEffect(() => {
-    if (!provider) return;
-
-    window.ethereum.on('connect', (connectionInfo: { chainId: string }) => {
+  // Log when the user connects and disconnects
+  const { address } = useAccount({
+    onConnect({ address }) {
       createLog({
         status: 'success',
         method: 'connect',
-        message: `Connected to chain: ${connectionInfo.chainId}`,
-      });
-    });
-
-    window.ethereum.on('disconnect', () => {
+        message: `Connected to app with account ${address}}`
+      })
+    },
+    onDisconnect() {
       createLog({
         status: 'warning',
         method: 'disconnect',
-        message: 'lost connection to the rpc',
+        message: 'user disconnected wallet',
       });
-    });
-
-    window.ethereum.on('accountsChanged', (newAccounts: String[]) => {
-      if (newAccounts) {
-        createLog({
-          status: 'info',
-          method: 'accountChanged',
-          message: `Switched to account: ${newAccounts}`,
-        });
-        accounts = newAccounts;
-      } else {
-        /**
-         * In this case dApps could...
-         *
-         * 1. Not do anything
-         * 2. Only re-connect to the new account if it is trusted
-         *
-         * ```
-         * provider.send('eth_requestAccounts', []).catch((err) => {
-         *  // fail silently
-         * });
-         * ```
-         *
-         * 3. Always attempt to reconnect
-         */
-
-        createLog({
-          status: 'info',
-          method: 'accountChanged',
-          message: 'Attempting to switch accounts.',
-        });
-
-        provider.send('eth_requestAccounts', []).catch((error) => {
-          createLog({
-            status: 'error',
-            method: 'accountChanged',
-            message: `Failed to re-connect: ${error.message}`,
-          });
-        });
-      }
-    });
-  }, [provider, createLog]);
+    }
+  })
 
   /** eth_sendTransaction */
   const handleEthSendTransaction = useCallback(async () => {
@@ -194,67 +173,41 @@ const useProps = (): Props => {
   }, [provider, createLog]);
 
   /** SignMessage */
-  const handleSignMessage = useCallback(async () => {
-    if (!provider) return;
-    try {
-      const signer = provider.getSigner();
-      const signature = await signer.signMessage(message);
+// This is where the error is happening
+  const { data, isError, isLoading, isSuccess, signMessage } = useSignMessage({ 
+    message,
+    onSettled(data, error) {
+      if(error) {
+        createLog({
+          status: 'error',
+          method: 'signMessage',
+          message: error.message,
+        })
+        return
+      }
       createLog({
         status: 'success',
         method: 'signMessage',
-        message: `Message signed: ${JSON.stringify(signature)}`,
-      });
-      return signature;
-    } catch (error) {
-      createLog({
-        status: 'error',
-        method: 'signMessage',
-        message: error.message,
-      });
+        message: `Message signed: ${data}`,
+      }); 
     }
-  }, [provider, createLog]);
+  })
 
-  /** Connect */
-  const handleConnect = useCallback(async () => {
-    if (!provider) return;
-
-    try {
-      accounts = await provider.send('eth_requestAccounts', []);
-      createLog({
-        status: 'success',
-        method: 'connect',
-        message: `connected to account: ${accounts[0]}`,
-      });
-    } catch (error) {
-      createLog({
-        status: 'error',
-        method: 'connect',
-        message: error.message,
-      });
-    }
-  }, [provider, createLog]);
-
-  const connectedMethods = useMemo(() => {
-    return [
+  const connectedMethods = 
+    [
       {
         name: 'Send Transaction',
         onClick: handleEthSendTransaction,
       },
       {
         name: 'Sign Message',
-        onClick: handleSignMessage,
-      },
-      {
-        name: 'Reconnect',
-        onClick: handleConnect,
+        onClick: () => signMessage(),
       },
     ];
-  }, [handleConnect, handleEthSendTransaction, handleSignMessage]);
 
   return {
-    address: accounts[0],
+    address,
     connectedMethods,
-    handleConnect,
     provider,
     logs,
     clearLogs,
@@ -266,12 +219,12 @@ const useProps = (): Props => {
 // =============================================================================
 
 const StatelessApp = React.memo((props: Props) => {
-  const { address, connectedMethods, handleConnect, logs, clearLogs } = props;
+  const { connectedMethods, logs, clearLogs, address } = props;
 
   return (
     
     <StyledApp>
-      <Sidebar address={address} connectedMethods={connectedMethods} connect={handleConnect} />
+      <Sidebar address={address} connectedMethods={connectedMethods} />
       <Logs address={address} logs={logs} clearLogs={clearLogs} />
     </StyledApp>
       
@@ -285,7 +238,13 @@ const StatelessApp = React.memo((props: Props) => {
 const App = () => {
   const props = useProps();
 
-  return <StatelessApp {...props} />;
+  return (
+    <WagmiConfig client={wagmiClient}>
+      <RainbowKitProvider chains={chains} theme={darkTheme()}>
+        <StatelessApp {...props} />
+      </RainbowKitProvider>
+    </WagmiConfig>
+  )
 };
 
 export default App;
