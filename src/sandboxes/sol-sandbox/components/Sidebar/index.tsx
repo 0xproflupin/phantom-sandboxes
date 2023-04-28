@@ -25,6 +25,7 @@ const Main = styled.main`
   background-color: ${REACT_GRAY};
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
+  max-height: 100vh;
   > * {
     margin-bottom: 10px;
   }
