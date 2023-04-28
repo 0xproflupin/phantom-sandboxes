@@ -7,9 +7,12 @@ then
   exit 1
 fi
 
+# Make sandbox react apps directory
+mkdir sandbox_react_apps
+
 # Set the sandbox directory path
-SANDBOX_DIR="$1"
-SANDBOX_REACT_APP_DIR="${1}_react_app"
+SANDBOX_DIR="sandboxes/${1}"
+SANDBOX_REACT_APP_DIR="sandbox_react_apps/${1}_react_app"
 
 # Check if the sandbox directory exists
 if [ ! -d "$SANDBOX_DIR" ]
@@ -155,4 +158,4 @@ sed '/<Menu>/,/<\/Menu>/d' "$SIDEBAR_FILE" > tmp_sidebar.tsx && mv tmp_sidebar.t
 yarn install
 
 # Done
-echo "Successfully created a standalone React app for $SANDBOX_DIR"
+echo "Successfully created a standalone React app for $1"
