@@ -7,6 +7,9 @@ then
   exit 1
 fi
 
+# Move to src
+cd ../src
+
 # Make sandbox react apps directory
 mkdir sandbox_react_apps
 
