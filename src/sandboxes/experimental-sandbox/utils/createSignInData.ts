@@ -1,15 +1,20 @@
 import { SignInData } from '../types';
 
-const createSignInData = async (): Promise<SignInData> => {
+const createSignInData = async (address: string): Promise<SignInData> => {
+  const now: Date = new Date();
+
+  // Convert the Date object to a string
+  const currentDateTime = now.toString();
   const signInData: SignInData = {
-    domain: "https://example.com",
-    address: "Fn9A5Ge92QkwrYAASFv5R7nh9VMve9ssERPfhaNPF3Lj",
+    domain: "vercel.app",
+    address,
     statement: "Sign-in to connect!",
-    uri: "https://example.com",
+    uri: "https://phantom-sandboxes.vercel.app/",
     version: "1",
-    nonce: "1",
+    nonce: "oBbLoEldZs",
     chain: "mainnet",
-    issuedAt: "2021-09-30T16:25:24Z",
+    issuedAt: currentDateTime,
+    // resources: ["https://example.com", "https://phantom.app/"]
   };
 
   return signInData;

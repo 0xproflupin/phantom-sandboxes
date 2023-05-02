@@ -175,7 +175,7 @@ const useProps = (): Props => {
   /** SignIn */
   const handleSignIn = useCallback(async () => {
     if (!provider) return;
-    const signInData = await createSignInData();
+    const signInData = await createSignInData(provider.publicKey.toString());
 
     try {
       const {address, signedMessage, signature} = await signIn(provider, signInData);
