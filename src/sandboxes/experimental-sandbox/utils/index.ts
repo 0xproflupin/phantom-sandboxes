@@ -1,5 +1,5 @@
 export { default as createAddressLookupTable } from './createAddressLookupTable';
-export { default as createSignInData } from './createSignInData';
+export { createSignInData, createSignInErrorData } from './createSignInData';
 export { default as createTransferTransaction } from './createTransferTransaction';
 export { default as createTransferTransactionV0 } from './createTransferTransactionV0';
 export { default as extendAddressLookupTable } from './extendAddressLookupTable';

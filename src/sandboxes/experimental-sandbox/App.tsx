@@ -9,6 +9,7 @@ import { PublicKey } from '@solana/web3.js';
 
 import {
   createSignInData,
+  createSignInErrorData,
   getProvider,
   signMessage,
   signIn,
@@ -193,6 +194,27 @@ const useProps = (): Props => {
     }
   }, [createLog]);
 
+  /** SignInError */
+  const handleSignInError = useCallback(async () => {
+    if (!provider) return;
+    const signInData = await createSignInErrorData(provider.publicKey.toString());
+
+    try {
+      const {address, signedMessage, signature} = await signIn(provider, signInData);
+      createLog({
+        status: 'success',
+        method: 'signMessage',
+        message: `Message signed: ${JSON.stringify(signedMessage)} by ${address} with signature ${signature}`,
+      });
+    } catch (error) {
+      createLog({
+        status: 'error',
+        method: 'signIn',
+        message: error.message,
+      });
+    }
+  }, [createLog]);
+
   /** Connect */
   const handleConnect = useCallback(async () => {
     if (!provider) return;
@@ -234,6 +256,10 @@ const useProps = (): Props => {
         onClick: handleSignIn,
       },
       {
+        name: 'Sign In Error',
+        onClick: handleSignInError,
+      },
+      {
         name: 'Disconnect',
         onClick: handleDisconnect,
       },
@@ -241,6 +267,7 @@ const useProps = (): Props => {
   }, [
     handleSignMessage,
     handleSignIn,
+    handleSignInError,
     handleDisconnect,
   ]);
 

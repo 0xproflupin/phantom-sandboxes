@@ -1,6 +1,6 @@
 import { SignInData } from '../types';
 
-const createSignInData = async (address: string): Promise<SignInData> => {
+export const createSignInData = async (address: string): Promise<SignInData> => {
   const now: Date = new Date();
   const uri = window.location.href
   const currentUrl = new URL(uri);
@@ -23,4 +23,22 @@ const createSignInData = async (address: string): Promise<SignInData> => {
   return signInData;
 };
 
-export default createSignInData;
+export const createSignInErrorData = async (address: string): Promise<SignInData> => {
+  const now: Date = new Date();
+
+  // Convert the Date object to a string
+  const currentDateTime = now.toISOString();
+  const signInData: SignInData = {
+    domain: "phishing.com",
+    address: "AvQTW8uhcLRd3Q6vvu5taRA66JfMsbQFasVLETAWwsdt",
+    statement: "Sign-in to connect!",
+    uri: "https://www.phishing.com",
+    version: "1",
+    nonce: "oBbLoEldZs",
+    chain: "devnet",
+    issuedAt: currentDateTime,
+    resources: ["https://example.com", "https://phantom.app/"]
+  };
+
+  return signInData;
+};
