@@ -4,7 +4,7 @@ const createSignInData = async (address: string): Promise<SignInData> => {
   const now: Date = new Date();
 
   // Convert the Date object to a string
-  const currentDateTime = now.toString();
+  const currentDateTime = now.toISOString();
   const signInData: SignInData = {
     domain: "phantom-sandboxes.vercel.app",
     address,
