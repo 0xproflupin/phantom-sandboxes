@@ -11,6 +11,7 @@ import { getProvider, sendTransaction } from './utils';
 import { TLog, Web3Provider } from './types';
 
 import { Logs, Sidebar } from './components';
+import { Ethereum } from '@wagmi/connectors';
 
 // =============================================================================
 // Styled Components
@@ -29,11 +30,6 @@ const StyledApp = styled.div`
 // Constants
 // =============================================================================
 
-declare global {
-  interface Window {
-    ethereum: any
-  }
-}
 let accounts = [];
 const message = 'To avoid digital dognappers, sign below to authenticate with CryptoCorgis.';
 const sleep = (timeInMS) => new Promise((resolve) => setTimeout(resolve, timeInMS));
