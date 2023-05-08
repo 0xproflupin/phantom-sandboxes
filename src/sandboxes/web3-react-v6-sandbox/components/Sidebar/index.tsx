@@ -1,5 +1,4 @@
 import React from 'react';
-import { PublicKey } from '@solana/web3.js';
 import styled from 'styled-components';
 import { NavLink } from 'react-router-dom';
 
@@ -185,9 +184,7 @@ const Menu = styled.div``;
 // =============================================================================
 
 interface Props {
-  publicKey?: PublicKey;
   connectedMethods: ConnectedMethods[];
-  connect: () => Promise<void>;
 }
 
 // =============================================================================
@@ -195,7 +192,7 @@ interface Props {
 // =============================================================================
 
 const Sidebar = React.memo((props: Props) => {
-  const { publicKey, connectedMethods, connect } = props;
+  const { connectedMethods } = props;
   const [menuOpen, setMenuOpen] = React.useState(false);
 
   const toggleMenu = () => {
@@ -213,21 +210,28 @@ const Sidebar = React.memo((props: Props) => {
                 <NavigationLink to="/eth-sandbox">Ethereum Sandbox</NavigationLink>
                 <NavigationLink to="/multi-chain-sandbox">Multi-Chain Sandbox</NavigationLink>
                 <NavigationLink to="/sol-adapter-sandbox">Solana Adapter Sandbox</NavigationLink>
-                <NavigationLink to="/web3-react-v6-sandbox">Web3-React V6 Sandbox</NavigationLink>
                 <NavigationLink to="/experimental-sandbox">Experimental Sandbox</NavigationLink>
               </MenuContainer>
             )}
         </Menu>
         <Link>
           <img src="https://phantom.app/img/phantom-logo.svg" alt="Phantom" width="200" />
-          <Subtitle>CodeSandbox</Subtitle>
+          <Subtitle>Web3-React-V6 Sandbox</Subtitle>
         </Link>
-        {publicKey ? (
+        <>
+
+            {connectedMethods.map((method, i) => (
+              <Button key={`${method.name}-${i}`} onClick={method.onClick}>
+                {method.name}
+              </Button>
+            ))}
+          </>
+        {/* {address ? (
           // connected
           <>
             <div>
               <Pre>Connected as</Pre>
-              <Badge>{publicKey.toBase58()}</Badge>
+              <Badge>{address}</Badge>
               <Divider />
             </div>
             {connectedMethods.map((method, i) => (
@@ -239,7 +243,7 @@ const Sidebar = React.memo((props: Props) => {
         ) : (
           // not connected
           <Button onClick={connect}>Connect to Phantom</Button>
-        )}
+        )} */}
       </Body>
       {/* 😊 💕  */}
       <Tag>
