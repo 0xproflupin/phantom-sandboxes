@@ -1,6 +1,6 @@
 import { SignInData } from '../types';
 
-export const createSignInData = async (address: string): Promise<SignInData> => {
+export const createSignInData = async (address?: string): Promise<SignInData> => {
   const now: Date = new Date();
   const uri = window.location.href
   const currentUrl = new URL(uri);
@@ -10,7 +10,6 @@ export const createSignInData = async (address: string): Promise<SignInData> => 
   const currentDateTime = now.toISOString();
   const signInData: SignInData = {
     domain,
-    address,
     statement: "Sign-in to connect!",
     uri,
     version: "1",
@@ -19,6 +18,9 @@ export const createSignInData = async (address: string): Promise<SignInData> => 
     issuedAt: currentDateTime,
     resources: ["https://example.com", "https://phantom.app/"]
   };
+  if (address) {
+    signInData.address = address;
+  }
 
   return signInData;
 };

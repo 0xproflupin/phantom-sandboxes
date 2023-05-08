@@ -2,7 +2,7 @@ import { PublicKey, Transaction, VersionedTransaction, SendOptions } from '@sola
 
 type DisplayEncoding = 'utf8' | 'hex';
 
-type PhantomEvent = 'connect' | 'disconnect' | 'accountChanged';
+type PhantomEvent = 'connect' | 'disconnect' | 'accountChanged' | 'signIn';
 
 type PhantomRequestMethod =
   | 'connect'

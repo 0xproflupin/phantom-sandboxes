@@ -15,7 +15,7 @@ import {
   signIn,
 } from './utils';
 
-import { TLog } from './types';
+import { PhantomProvider, TLog } from './types';
 
 import { Logs, Sidebar } from './components';
 
@@ -36,9 +36,9 @@ const StyledApp = styled.div`
 // Constants
 // =============================================================================
 
-// NB: This URL will only work for Phantom sandbox apps! Please do not use this for your project.
-const provider = getProvider();
 const message = 'To avoid digital dognappers, sign below to authenticate with CryptoCorgis.';
+const sleep = (timeInMS) => new Promise((resolve) => setTimeout(resolve, timeInMS));
+
 
 // =============================================================================
 // Typedefs
@@ -71,7 +71,8 @@ interface Props {
  * The fun stuff!
  */
 const useProps = (): Props => {
-  const [logs, setLogs] = useState<TLog[]>([]);
+  const [provider, setProvider] = useState<PhantomProvider | null>(null);
+  const [logs, setLogs] = useState<TLog[]>([]); 
 
   const createLog = useCallback(
     (log: TLog) => {
@@ -85,14 +86,22 @@ const useProps = (): Props => {
   }, [setLogs]);
 
   useEffect(() => {
+    (async () => {
+      // sleep for 100 ms to give time to inject
+      await sleep(100);
+      setProvider(getProvider());
+    })();
+  }, []);
+  
+  useEffect(() => {
     if (!provider) return;
 
     // attempt to eagerly connect
-    provider.connect({ onlyIfTrusted: true }).catch(() => {
-      // fail silently
+    provider.connect({ onlyIfTrusted: true }).catch((e) => {
+      console.log(e);
     });
 
-    provider.on('connect', (publicKey: PublicKey) => {
+    provider.on('signIn', (publicKey: PublicKey) => {
       createLog({
         status: 'success',
         method: 'connect',
@@ -150,7 +159,7 @@ const useProps = (): Props => {
     return () => {
       provider.disconnect();
     };
-  }, [createLog]);
+  }, [createLog, provider]);
 
   /** SignMessage */
   const handleSignMessage = useCallback(async () => {
@@ -171,12 +180,12 @@ const useProps = (): Props => {
         message: error.message,
       });
     }
-  }, [createLog]);
+  }, [createLog, provider]);
 
   /** SignIn */
   const handleSignIn = useCallback(async () => {
     if (!provider) return;
-    const signInData = await createSignInData(provider.publicKey.toString());
+    const signInData = await createSignInData();
 
     try {
       const {address, signedMessage, signature} = await signIn(provider, signInData);
@@ -192,7 +201,7 @@ const useProps = (): Props => {
         message: error.message,
       });
     }
-  }, [createLog]);
+  }, [createLog, provider]);
 
   /** SignInError */
   const handleSignInError = useCallback(async () => {
@@ -213,22 +222,7 @@ const useProps = (): Props => {
         message: error.message,
       });
     }
-  }, [createLog]);
-
-  /** Connect */
-  const handleConnect = useCallback(async () => {
-    if (!provider) return;
-
-    try {
-      await provider.connect();
-    } catch (error) {
-      createLog({
-        status: 'error',
-        method: 'connect',
-        message: error.message,
-      });
-    }
-  }, [createLog]);
+  }, [createLog, provider]);
 
   /** Disconnect */
   const handleDisconnect = useCallback(async () => {
@@ -243,7 +237,7 @@ const useProps = (): Props => {
         message: error.message,
       });
     }
-  }, [createLog]);
+  }, [createLog, provider]);
 
   const connectedMethods = useMemo(() => {
     return [
@@ -274,7 +268,7 @@ const useProps = (): Props => {
   return {
     publicKey: provider?.publicKey || null,
     connectedMethods,
-    handleConnect,
+    handleConnect: handleSignIn,
     logs,
     clearLogs,
   };
