@@ -6,6 +6,7 @@ import { MultiChainSandbox } from './sandboxes/multi-chain-sandbox';
 import { SolAdapterSandbox } from './sandboxes/adapter-sandbox';
 import { RainbowKitSandbox } from './sandboxes/rainbowkit-sandbox';
 import { ExperimentalSandbox } from './sandboxes/experimental-sandbox';
+import { WagmiSandbox } from './sandboxes/wagmi-sandbox';
 
 function App() {
   return (
@@ -17,6 +18,7 @@ function App() {
         <Route path="/multi-chain-sandbox" element={<MultiChainSandbox />} />
         <Route path="/sol-adapter-sandbox" element={<SolAdapterSandbox />} />
         <Route path="/rainbowkit-sandbox" element={<RainbowKitSandbox />} />
+        <Route path="/wagmi-sandbox" element={<WagmiSandbox/>} />
         <Route path="/experimental-sandbox" element={<ExperimentalSandbox />} />
       </Routes>
     </Router>
