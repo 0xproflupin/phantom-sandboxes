@@ -5,9 +5,6 @@
  */
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import styled from 'styled-components';
-import '@rainbow-me/rainbowkit/styles.css';
-import { connectorsForWallets, RainbowKitProvider, darkTheme } from '@rainbow-me/rainbowkit';
-import { phantomWallet, injectedWallet } from '@rainbow-me/rainbowkit/wallets';
 import {
   configureChains,
   createClient,
@@ -29,16 +26,9 @@ import { utils } from 'ethers';
 // Rainbowkit Configuration
 // =============================================================================
 // initalize which chains your dapp will use, and set up a provider
-const { chains, provider } = configureChains([goerli], [publicProvider()]);
-const connectors = connectorsForWallets([
-  {
-    groupName: 'The Best',
-    wallets: [phantomWallet({ chains }), injectedWallet({ chains })],
-  },
-]);
+const { provider } = configureChains([goerli], [publicProvider()]);
 
 const wagmiClient = createClient({
-  connectors,
   provider,
 });
 
@@ -221,9 +211,7 @@ const App = () => {
 
   return (
     <WagmiConfig client={wagmiClient}>
-      <RainbowKitProvider chains={chains} theme={darkTheme()}>
         <Stateless {...props} />
-      </RainbowKitProvider>
     </WagmiConfig>
   );
 };

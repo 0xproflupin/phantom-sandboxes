@@ -17,6 +17,7 @@
     "@types/node": "^16.7.13",
     "@types/react": "^18.0.0",
     "@types/react-dom": "^18.0.0",
+    "@wagmi/core": "^0.10.11",
     "bs58": "^5.0.0",
     "ethers": "^5",
     "react": "^18.2.0",
