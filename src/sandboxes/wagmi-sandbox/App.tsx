@@ -23,7 +23,7 @@ import { Logs, Sidebar } from './components';
 import { utils } from 'ethers';
 
 // =============================================================================
-// Rainbowkit Configuration
+// wagmi configuration
 // =============================================================================
 // initalize which chains your dapp will use, and set up a provider
 const { provider } = configureChains([goerli], [publicProvider()]);
