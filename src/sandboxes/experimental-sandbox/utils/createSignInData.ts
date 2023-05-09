@@ -10,7 +10,7 @@ export const createSignInData = async (address?: string): Promise<SignInData> =>
   const currentDateTime = now.toISOString();
   const signInData: SignInData = {
     domain,
-    statement: "Sign-in to connect!",
+    statement: "Clicking Sign or Approve only means you have proved this wallet is owned by you. This request will not trigger any blockchain transaction or cost any gas fee. Use of our website and service are subject to our Terms of Service: https://magiceden.io/terms-of-service.pdf and Privacy Policy: https://magiceden.io/privacy-policy.pdf Clicking Sign or Approve only means you have proved this wallet is owned by you. This request will not trigger any blockchain transaction or cost any gas fee. Use of our website and service are subject to our Terms of Service: https://magiceden.io/terms-of-service.pdf and Privacy Policy: https://magiceden.io/privacy-policy.pdf",
     uri,
     version: "1",
     nonce: "oBbLoEldZs",

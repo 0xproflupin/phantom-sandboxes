@@ -96,10 +96,10 @@ const useProps = (): Props => {
   useEffect(() => {
     if (!provider) return;
 
-    // attempt to eagerly connect
-    provider.connect({ onlyIfTrusted: true }).catch((e) => {
-      console.log(e);
-    });
+    // // attempt to eagerly connect
+    // provider.connect({ onlyIfTrusted: true }).catch((e) => {
+    //   console.log(e);
+    // });
 
     provider.on('signIn', (publicKey: PublicKey) => {
       createLog({
@@ -146,13 +146,13 @@ const useProps = (): Props => {
           message: 'Attempting to switch accounts.',
         });
 
-        provider.connect().catch((error) => {
-          createLog({
-            status: 'error',
-            method: 'accountChanged',
-            message: `Failed to re-connect: ${error.message}`,
-          });
-        });
+        // provider.connect().catch((error) => {
+        //   createLog({
+        //     status: 'error',
+        //     method: 'accountChanged',
+        //     message: `Failed to re-connect: ${error.message}`,
+        //   });
+        // });
       }
     });
 
