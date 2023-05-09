@@ -214,6 +214,7 @@ const Sidebar = React.memo((props: Props) => {
                 <NavigationLink to="/multi-chain-sandbox">Multi-Chain Sandbox</NavigationLink>
                 <NavigationLink to="/sol-adapter-sandbox">Solana Adapter Sandbox</NavigationLink>
                 <NavigationLink to="/rainbowkit-sandbox">Rainbowkit Sandbox</NavigationLink>
+                <NavigationLink to="/wagmi-sandbox">Wagmi Sandbox</NavigationLink>
                 <NavigationLink to="/experimental-sandbox">Experimental Sandbox</NavigationLink>
               </MenuContainer>
             )}

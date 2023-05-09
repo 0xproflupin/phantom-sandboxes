@@ -1,14 +1,15 @@
 import React from 'react';
 import styled from 'styled-components';
 import { NavLink } from 'react-router-dom';
-import { ConnectButton } from '@rainbow-me/rainbowkit';
-
 import { GRAY, REACT_GRAY, PURPLE, WHITE, DARK_GRAY } from '../../constants';
 
 import { hexToRGB } from '../../utils';
 
 import Button from '../Button';
 import { ConnectedMethods } from '../../App';
+import {  goerli } from 'wagmi';
+import { connect, } from '@wagmi/core';
+import { PhantomConnector } from '../../utils/PhantomConnector';
 
 // =============================================================================
 // Styled Components
@@ -74,6 +75,36 @@ const Divider = styled.div`
   border: 1px solid ${DARK_GRAY};
   height: 1px;
   margin: 20px 0;
+`;
+
+const Badge = styled.div`
+  margin: 0;
+  padding: 10px;
+  width: 100%;
+  color: ${PURPLE};
+  background-color: ${hexToRGB(PURPLE, 0.2)};
+  font-size: 14px;
+  border-radius: 6px;
+  @media (max-width: 400px) {
+    width: 280px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  @media (max-width: 320px) {
+    width: 220px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  ::selection {
+    color: ${WHITE};
+    background-color: ${hexToRGB(PURPLE, 0.5)};
+  }
+  ::-moz-selection {
+    color: ${WHITE};
+    background-color: ${hexToRGB(PURPLE, 0.5)};
+  }
 `;
 
 const Tag = styled.p`
@@ -164,7 +195,7 @@ interface Props {
 // =============================================================================
 
 const Sidebar = React.memo((props: Props) => {
-  const { connectedMethods, address } = props;
+  const { connectedMethods, address  } = props;
   const [menuOpen, setMenuOpen] = React.useState(false);
 
   const toggleMenu = () => {
@@ -197,7 +228,7 @@ const Sidebar = React.memo((props: Props) => {
           <>
             <div>
               <Pre>Connected as</Pre>
-              <ConnectButton />
+              <Badge>{address}</Badge>
               <Divider />
             </div>
             {connectedMethods.map((method, i) => (
@@ -208,7 +239,12 @@ const Sidebar = React.memo((props: Props) => {
           </>
         ) : (
           // not connected
-          <ConnectButton />
+            <Button onClick={() => connect({
+              connector: new PhantomConnector(),
+              chainId: goerli.id
+            })}>
+              Connect To Phantom
+            </Button>
         )}
       </Body>
       {/* 😊 💕  */}
