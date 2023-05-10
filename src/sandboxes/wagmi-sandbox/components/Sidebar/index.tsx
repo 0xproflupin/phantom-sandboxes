@@ -8,8 +8,9 @@ import { hexToRGB } from '../../utils';
 import Button from '../Button';
 import { ConnectedMethods } from '../../App';
 import { goerli } from 'wagmi/chains';
-import { connect, } from '@wagmi/core';
+import { connect } from '@wagmi/core';
 import { PhantomConnector } from 'phantom-wagmi-connector';
+import { useAccount, useConnect } from 'wagmi';
 
 // =============================================================================
 // Styled Components
@@ -186,7 +187,6 @@ const Menu = styled.div``;
 // =============================================================================
 
 interface Props {
-  address?: string;
   connectedMethods: ConnectedMethods[];
 }
 
@@ -195,8 +195,10 @@ interface Props {
 // =============================================================================
 
 const Sidebar = React.memo((props: Props) => {
-  const { connectedMethods, address  } = props;
+  const { connectedMethods } = props;
   const [menuOpen, setMenuOpen] = React.useState(false);
+  const { connector, isConnected, address } = useAccount();
+  const { connect, connectors, error, isLoading, pendingConnector } = useConnect();
 
   const toggleMenu = () => {
     setMenuOpen(!menuOpen);
@@ -207,17 +209,17 @@ const Sidebar = React.memo((props: Props) => {
       <Body>
         <Menu>
           <MenuButton onClick={toggleMenu}>Sandboxes</MenuButton>
-            {menuOpen && (
-              <MenuContainer>
-                <NavigationLink to="/sol-sandbox">Solana Sandbox</NavigationLink>
-                <NavigationLink to="/eth-sandbox">Ethereum Sandbox</NavigationLink>
-                <NavigationLink to="/multi-chain-sandbox">Multi-Chain Sandbox</NavigationLink>
-                <NavigationLink to="/sol-adapter-sandbox">Solana Adapter Sandbox</NavigationLink>
-                <NavigationLink to="/rainbowkit-sandbox">Rainbowkit Sandbox</NavigationLink>
-                <NavigationLink to="/wagmi-sandbox">Wagmi Sandbox</NavigationLink>
-                <NavigationLink to="/experimental-sandbox">Experimental Sandbox</NavigationLink>
-              </MenuContainer>
-            )}
+          {menuOpen && (
+            <MenuContainer>
+              <NavigationLink to="/sol-sandbox">Solana Sandbox</NavigationLink>
+              <NavigationLink to="/eth-sandbox">Ethereum Sandbox</NavigationLink>
+              <NavigationLink to="/multi-chain-sandbox">Multi-Chain Sandbox</NavigationLink>
+              <NavigationLink to="/sol-adapter-sandbox">Solana Adapter Sandbox</NavigationLink>
+              <NavigationLink to="/rainbowkit-sandbox">Rainbowkit Sandbox</NavigationLink>
+              <NavigationLink to="/wagmi-sandbox">Wagmi Sandbox</NavigationLink>
+              <NavigationLink to="/experimental-sandbox">Experimental Sandbox</NavigationLink>
+            </MenuContainer>
+          )}
         </Menu>
         <Link>
           <img src="https://phantom.app/img/phantom-logo.svg" alt="Phantom" width="200" />
@@ -239,14 +241,14 @@ const Sidebar = React.memo((props: Props) => {
           </>
         ) : (
           // not connected
-            <Button onClick={() => connect({
-              connector: new PhantomConnector({
-                chains: [goerli]
-              }),
-              chainId: goerli.id
-            })}>
-              Connect To Phantom
-            </Button>
+          <>
+            {connectors.map((connector) => (
+              <Button disabled={!connector.ready} key={connector.id} onClick={() => connect({ connector })}>
+                Connect to {connector.name}
+                {isLoading && pendingConnector?.id === connector.id && ' (connecting)'}
+              </Button>
+            ))}
+          </>
         )}
       </Body>
       {/* 😊 💕  */}

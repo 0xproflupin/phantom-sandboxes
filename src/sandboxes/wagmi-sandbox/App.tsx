@@ -12,7 +12,6 @@ import {
   useAccount,
   useSignMessage,
   useSendTransaction,
-  useWalletClient,
   usePrepareSendTransaction,
 } from 'wagmi';
 import { publicProvider } from 'wagmi/providers/public';
@@ -22,15 +21,19 @@ import { TLog } from './types';
 
 import { Logs, Sidebar } from './components';
 import { parseGwei } from 'viem';
+import { PhantomConnector } from 'phantom-wagmi-connector';
 
 // =============================================================================
 // wagmi configuration
 // =============================================================================
-const { publicClient, webSocketPublicClient } = configureChains([goerli], [publicProvider()]);
+const { publicClient, webSocketPublicClient, chains } = configureChains([goerli], [publicProvider()]);
 
 const wagmiConfig = createConfig({
   publicClient,
-  webSocketPublicClient
+  webSocketPublicClient,
+  connectors: [
+    new PhantomConnector({ chains }),
+  ]
 });
 
 
@@ -198,7 +201,7 @@ const Stateless = React.memo((props: Props) => {
 
   return (
     <StyledApp>
-      <Sidebar address={address} connectedMethods={connectedMethods} />
+      <Sidebar connectedMethods={connectedMethods} />
       <Logs address={address} logs={logs} clearLogs={clearLogs} />
     </StyledApp>
   );
