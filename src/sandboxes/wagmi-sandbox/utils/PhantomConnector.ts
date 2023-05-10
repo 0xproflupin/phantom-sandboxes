@@ -1,15 +1,17 @@
 import {
     ConnectorNotFoundError,
-    ResourceUnavailableError,
-    UserRejectedRequestError,
-    getClient,
-    Ethereum,
+    WindowProvider,
     InjectedConnector,
     InjectedConnectorOptions
   } from '@wagmi/core'
-  import type { Address, RpcError } from '@wagmi/core'
+  import {
+    ProviderRpcError,
+    ResourceNotFoundRpcError,
+    UserRejectedRequestError,
+    getAddress,
+  } from 'viem'
+  import type { Address } from 'abitype'
   import type { Chain } from '@wagmi/core/chains'
-  import { getAddress } from 'ethers/lib/utils.js'
   
   export class PhantomConnector extends InjectedConnector {
     readonly id = 'phantom'
@@ -28,14 +30,14 @@ import {
         name: 'Phantom',
         shimDisconnect: true,
         getProvider() {
-          function getReady(ethereum?: Ethereum) {
+          function getReady(ethereum?: WindowProvider) {
             const isPhantom = !!ethereum?.isPhantom
             if (!isPhantom) return
             return ethereum
           }
   
           if (typeof window === 'undefined') return
-          const ethereum = window.phantom.ethereum as Ethereum | undefined
+          const ethereum = window.phantom.ethereum as WindowProvider | undefined
           if (ethereum?.providers) return ethereum.providers.find(getReady)
           return getReady(ethereum)
         },
@@ -62,7 +64,7 @@ import {
         let account: Address | null = null
         if (
           this.options?.shimDisconnect &&
-          !getClient().storage?.getItem(this.shimDisconnectKey)
+          !this.storage?.getItem(this.shimDisconnectKey)
         ) {
           account = await this.getAccount().catch(() => null)
           const isConnected = !!account
@@ -79,8 +81,8 @@ import {
               if (this.isUserRejectedRequestError(error))
                 throw new UserRejectedRequestError(error)
               if (
-                (error as ResourceUnavailableError).code ===
-                new ResourceUnavailableError(error).code
+                (error as ProviderRpcError).code ===
+                new ResourceNotFoundRpcError(error).code
               )
                 throw error
             }
@@ -103,14 +105,14 @@ import {
         }
   
         if (this.options?.shimDisconnect)
-          getClient().storage?.setItem(this.shimDisconnectKey, true)
+          this.storage?.setItem(this.shimDisconnectKey, true)
   
         return { account, chain: { id, unsupported }, provider }
       } catch (error) {
         if (this.isUserRejectedRequestError(error))
-          throw new UserRejectedRequestError(error)
-        if ((error as RpcError).code === -32002)
-          throw new ResourceUnavailableError(error)
+          throw new UserRejectedRequestError(error as Error)
+        if ((error as ProviderRpcError).code === -32002)
+          throw new ResourceNotFoundRpcError(error as ProviderRpcError)
         throw error
       }
     }

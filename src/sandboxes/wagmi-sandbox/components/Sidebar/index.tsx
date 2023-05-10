@@ -7,9 +7,9 @@ import { hexToRGB } from '../../utils';
 
 import Button from '../Button';
 import { ConnectedMethods } from '../../App';
-import {  goerli } from 'wagmi';
+import { goerli } from 'wagmi/chains';
 import { connect, } from '@wagmi/core';
-import { PhantomConnector } from '../../utils/PhantomConnector';
+import { PhantomConnector } from 'phantom-wagmi-connector';
 
 // =============================================================================
 // Styled Components
@@ -240,7 +240,9 @@ const Sidebar = React.memo((props: Props) => {
         ) : (
           // not connected
             <Button onClick={() => connect({
-              connector: new PhantomConnector(),
+              connector: new PhantomConnector({
+                chains: [goerli]
+              }),
               chainId: goerli.id
             })}>
               Connect To Phantom
