@@ -13,6 +13,7 @@ import {
   useSignMessage,
   useSendTransaction,
   usePrepareSendTransaction,
+  useDisconnect,
 } from 'wagmi';
 import { publicProvider } from 'wagmi/providers/public';
 import { goerli } from 'wagmi/chains'
@@ -161,14 +162,13 @@ const Stateless = React.memo((props: Props) => {
       });
     },
   });
-  let { config } = usePrepareSendTransaction({
+  const { config } = usePrepareSendTransaction({
     to: '0x0000000000000000000000000000000000000000', // Common for burning ETH
     value: parseGwei('1', 'wei'), 
   })
 
   const { sendTransaction } = useSendTransaction({
     ...config,
-    account: address,
     onSettled(data, error) {
       if (error) {
         createLog({
@@ -186,6 +186,8 @@ const Stateless = React.memo((props: Props) => {
     },
   });
 
+  const { disconnect } = useDisconnect()
+
   const connectedMethods = useMemo(() => {
     return [
       {
@@ -196,8 +198,12 @@ const Stateless = React.memo((props: Props) => {
         name: 'Send Transaction (burn 1 wei on Goerli)',
         onClick: () => sendTransaction?.(),
       },
+      {
+        name: 'Disconnect',
+        onClick: () => disconnect(),
+      },
     ];
-  }, [signMessage, sendTransaction]);
+  }, [signMessage, sendTransaction, disconnect]);
 
   return (
     <StyledApp>

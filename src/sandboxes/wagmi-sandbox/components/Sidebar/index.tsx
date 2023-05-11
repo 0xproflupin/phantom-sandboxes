@@ -7,10 +7,8 @@ import { hexToRGB } from '../../utils';
 
 import Button from '../Button';
 import { ConnectedMethods } from '../../App';
-import { goerli } from 'wagmi/chains';
-import { connect } from '@wagmi/core';
-import { PhantomConnector } from 'phantom-wagmi-connector';
 import { useAccount, useConnect } from 'wagmi';
+import { goerli } from 'viem/chains';
 
 // =============================================================================
 // Styled Components
@@ -197,8 +195,8 @@ interface Props {
 const Sidebar = React.memo((props: Props) => {
   const { connectedMethods } = props;
   const [menuOpen, setMenuOpen] = React.useState(false);
-  const { connector, isConnected, address } = useAccount();
-  const { connect, connectors, error, isLoading, pendingConnector } = useConnect();
+  const { address } = useAccount();
+  const { connect, connectors, isLoading, pendingConnector } = useConnect();
 
   const toggleMenu = () => {
     setMenuOpen(!menuOpen);
@@ -243,7 +241,7 @@ const Sidebar = React.memo((props: Props) => {
           // not connected
           <>
             {connectors.map((connector) => (
-              <Button disabled={!connector.ready} key={connector.id} onClick={() => connect({ connector })}>
+              <Button disabled={!connector.ready} key={connector.id} onClick={() => connect({ connector, chainId: goerli.id })}>
                 Connect to {connector.name}
                 {isLoading && pendingConnector?.id === connector.id && ' (connecting)'}
               </Button>
