@@ -3,7 +3,7 @@
  * This will trigger a re-install of the dependencies in the sandbox – which should fix things right up.
  * Alternatively, you can fork this sandbox to refresh the dependencies manually.
  */
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import styled from 'styled-components';
 
 import { getProvider, sendTransaction } from './utils';
@@ -63,13 +63,14 @@ export type ConnectedMethods =
     }
   | {
       name: string;
-      onClick: () => Promise<void>;
+      onClick: () => void;
     };
 
 interface Props {
   // connectedMethods: ConnectedMethods[];
   logs: TLog[];
   clearLogs: () => void;
+  createLog: (log: TLog) => void;
 }
 
 // =============================================================================
@@ -97,6 +98,7 @@ const useProps = (): Props => {
 
   return {
     logs,
+    createLog,
     clearLogs,
   };
 };
@@ -106,25 +108,51 @@ const useProps = (): Props => {
 // =============================================================================
 
 const StatelessApp = React.memo((props: Props) => {
-  const { logs, clearLogs } = props;
-  const { active, library, activate } = useWeb3React();
+  const { logs, clearLogs, createLog } = props;
+  const { active, library, activate, account } = useWeb3React();
+  let prevAccount = useRef(account)
+  useEffect(() => {
+    // createLog({
+      // status: 'success',
+      // method: 'connect',
+      // message: `Connected to app with account: ${account}}`,
+    // });
+  prevAccount.current = account
+  }, [account, createLog])
 
-  console.log(active, library, activate);
+  // console.log(active, library, activate);
 
-  const handleConnect = async () => {
+  const handleConnect = () => {
     try {
-      await activate(phantom, () => {}, true);
-      console.log('Wallet connected!');
+      activate(phantom)
+      createLog({
+        status: 'success',
+        method: 'connect',
+        message: `Connected to app`,
+      });
     } catch(e) {
-      console.error(e);
+      createLog({
+        status: 'error',
+        method: 'connect',
+        message: e.message,
+      });
     }
   }
 
-  const handleDisconnect = async () => {
+  const handleDisconnect = () => {
     try {
-      await phantom.deactivate();
-      console.log('Wallet disconnected!');
+      phantom.deactivate();
+      createLog({
+        status: 'warning',
+        method: 'disconnect',
+        message: 'user disconnected wallet',
+      });
     } catch(e) {
+      createLog({
+        status: 'error',
+        method: 'disconnect',
+        message: e.message,
+      });
       console.error(e);
     }
   }
@@ -133,9 +161,17 @@ const StatelessApp = React.memo((props: Props) => {
     try {
       const signer = await library.getSigner();
       const sig = await signer.signMessage(message);
-      console.log(sig);
+      createLog({
+        status: 'success',
+        method: 'signMessage',
+        message: `Message signed: ${sig}`,
+      });
     } catch(e) {
-      console.error(e);
+      createLog({
+        status: 'error',
+        method: 'signMessage',
+        message: e.message,
+      });
     }
   };
 
