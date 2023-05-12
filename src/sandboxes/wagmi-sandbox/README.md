@@ -1,3 +1,3 @@
-# Phantom Wallet Sandbox
+# Phantom Wagmi Sandbox
 
- A playground for learning how to interact with Phantom Wallet
+[https://phantom-sandboxes.vercel.app/wagmi-sandbox](https://phantom-sandboxes.vercel.app/wagmi-sandbox)

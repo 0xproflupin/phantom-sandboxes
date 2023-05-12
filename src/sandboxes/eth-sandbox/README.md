@@ -1,5 +1,3 @@
-# Phantom Wallet Sandbox
+# Phantom Ethereum Sandbox
 
-> A CodeSandbox for learning how to interact with Phantom Wallet
-
-[Play with the sandbox in full view](https://36ll5s.csb.app/)
+[https://phantom-sandboxes.vercel.app/eth-sandbox](https://phantom-sandboxes.vercel.app/eth-sandbox)
