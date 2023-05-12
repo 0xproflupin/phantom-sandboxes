@@ -96,12 +96,12 @@ const useProps = (): Props => {
   useEffect(() => {
     if (!provider) return;
 
-    // // attempt to eagerly connect
-    // provider.connect({ onlyIfTrusted: true }).catch((e) => {
-    //   console.log(e);
-    // });
+    // attempt to eagerly connect
+    provider.connect({ onlyIfTrusted: true }).catch((e) => {
+      handleSignIn();
+    });
 
-    provider.on('signIn', (publicKey: PublicKey) => {
+    provider.on('connect', (publicKey: PublicKey) => {
       createLog({
         status: 'success',
         method: 'connect',
@@ -146,19 +146,20 @@ const useProps = (): Props => {
           message: 'Attempting to switch accounts.',
         });
 
-        // provider.connect().catch((error) => {
-        //   createLog({
-        //     status: 'error',
-        //     method: 'accountChanged',
-        //     message: `Failed to re-connect: ${error.message}`,
-        //   });
-        // });
+        provider.connect().catch((error) => {
+          createLog({
+            status: 'error',
+            method: 'accountChanged',
+            message: `Failed to re-connect: ${error.message}`,
+          });
+        });
       }
     });
 
     return () => {
       provider.disconnect();
     };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [createLog, provider]);
 
   /** SignMessage */
@@ -191,7 +192,7 @@ const useProps = (): Props => {
       const {address, signedMessage, signature} = await signIn(provider, signInData);
       createLog({
         status: 'success',
-        method: 'signMessage',
+        method: 'signIn',
         message: `Message signed: ${JSON.stringify(signedMessage)} by ${address} with signature ${signature}`,
       });
     } catch (error) {
