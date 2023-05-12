@@ -51,6 +51,7 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
+    "create-app": "sh ./scripts/create-react-app-from-sandbox.sh",
     "tsc": "tsc"
   },
   "eslintConfig": {
