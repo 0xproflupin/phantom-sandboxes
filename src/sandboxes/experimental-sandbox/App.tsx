@@ -190,10 +190,11 @@ const useProps = (): Props => {
 
     try {
       const {address, signedMessage, signature} = await signIn(provider, signInData);
+      const message = new TextDecoder().decode(signedMessage);
       createLog({
         status: 'success',
         method: 'signIn',
-        message: `Message signed: ${JSON.stringify(signedMessage)} by ${address} with signature ${signature}`,
+        message: `Message signed: ${message} by ${address} with signature ${signature}`,
       });
     } catch (error) {
       createLog({
