@@ -7,30 +7,37 @@ import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react'
 import styled from 'styled-components';
 import {
   configureChains,
-  createClient,
-  goerli,
+  createConfig,
   WagmiConfig,
   useAccount,
   useSignMessage,
   useSendTransaction,
   usePrepareSendTransaction,
+  useDisconnect,
 } from 'wagmi';
 import { publicProvider } from 'wagmi/providers/public';
+import { goerli } from 'wagmi/chains'
 
 import { TLog } from './types';
 
 import { Logs, Sidebar } from './components';
-import { utils } from 'ethers';
+import { parseGwei } from 'viem';
+import { PhantomConnector } from 'phantom-wagmi-connector';
 
 // =============================================================================
 // wagmi configuration
 // =============================================================================
-// initalize which chains your dapp will use, and set up a provider
-const { provider } = configureChains([goerli], [publicProvider()]);
+const { publicClient, webSocketPublicClient, chains } = configureChains([goerli], [publicProvider()]);
 
-const wagmiClient = createClient({
-  provider,
+const wagmiConfig = createConfig({
+  publicClient,
+  webSocketPublicClient,
+  connectors: [
+    new PhantomConnector({ chains }),
+  ]
 });
+
+
 
 // =============================================================================
 // Styled Components
@@ -50,11 +57,6 @@ const StyledApp = styled.div`
 // =============================================================================
 
 const MESSAGE = 'To avoid digital dognappers, sign below to authenticate with CryptoCorgis.';
-//0x0000...000 common for burning ETH
-const TRANSACTION_CONFIG = {
-  chainId: goerli.id,
-  request: { value: utils.parseUnits('1', 'wei'), to: '0x0000000000000000000000000000000000000000' },
-};
 // =============================================================================
 // Typedefs
 // =============================================================================
@@ -112,12 +114,12 @@ const useProps = (): Props => {
 
 const Stateless = React.memo((props: Props) => {
   const { createLog, logs, clearLogs } = props;
-  const { address, status } = useAccount();
+  const { address, status } = useAccount()
   let prevStatus = useRef(status);
   useEffect(() => {
     switch (status) {
       case 'disconnected':
-        if (prevStatus.current === 'disconnected') break;
+        if (status === prevStatus.current) break
         createLog({
           status: 'warning',
           method: 'disconnect',
@@ -160,8 +162,11 @@ const Stateless = React.memo((props: Props) => {
       });
     },
   });
+  const { config } = usePrepareSendTransaction({
+    to: '0x0000000000000000000000000000000000000000', // Common for burning ETH
+    value: parseGwei('1', 'wei'), 
+  })
 
-  const { config } = usePrepareSendTransaction(TRANSACTION_CONFIG);
   const { sendTransaction } = useSendTransaction({
     ...config,
     onSettled(data, error) {
@@ -181,6 +186,8 @@ const Stateless = React.memo((props: Props) => {
     },
   });
 
+  const { disconnect } = useDisconnect()
+
   const connectedMethods = useMemo(() => {
     return [
       {
@@ -189,14 +196,18 @@ const Stateless = React.memo((props: Props) => {
       },
       {
         name: 'Send Transaction (burn 1 wei on Goerli)',
-        onClick: () => sendTransaction(),
+        onClick: () => sendTransaction?.(),
+      },
+      {
+        name: 'Disconnect',
+        onClick: () => disconnect(),
       },
     ];
-  }, [signMessage, sendTransaction]);
+  }, [signMessage, sendTransaction, disconnect]);
 
   return (
     <StyledApp>
-      <Sidebar address={address} connectedMethods={connectedMethods} />
+      <Sidebar connectedMethods={connectedMethods} />
       <Logs address={address} logs={logs} clearLogs={clearLogs} />
     </StyledApp>
   );
@@ -210,7 +221,7 @@ const App = () => {
   const props = useProps();
 
   return (
-    <WagmiConfig client={wagmiClient}>
+    <WagmiConfig config={wagmiConfig}>
         <Stateless {...props} />
     </WagmiConfig>
   );

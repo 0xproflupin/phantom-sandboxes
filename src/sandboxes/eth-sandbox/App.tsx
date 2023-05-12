@@ -11,7 +11,6 @@ import { getProvider, sendTransaction } from './utils';
 import { TLog, Web3Provider } from './types';
 
 import { Logs, Sidebar } from './components';
-import { Ethereum } from '@wagmi/connectors';
 
 // =============================================================================
 // Styled Components

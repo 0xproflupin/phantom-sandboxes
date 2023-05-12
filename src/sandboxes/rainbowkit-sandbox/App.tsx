@@ -10,8 +10,7 @@ import { connectorsForWallets, RainbowKitProvider, darkTheme } from '@rainbow-me
 import { phantomWallet, injectedWallet } from '@rainbow-me/rainbowkit/wallets';
 import {
   configureChains,
-  createClient,
-  goerli,
+  createConfig,
   WagmiConfig,
   useAccount,
   useSignMessage,
@@ -19,6 +18,7 @@ import {
   usePrepareSendTransaction,
 } from 'wagmi';
 import { publicProvider } from 'wagmi/providers/public';
+import { goerli } from 'wagmi/chains'
 
 import { TLog } from './types';
 
@@ -29,7 +29,7 @@ import { utils } from 'ethers';
 // Rainbowkit Configuration
 // =============================================================================
 // initalize which chains your dapp will use, and set up a provider
-const { chains, provider } = configureChains([goerli], [publicProvider()]);
+const { chains, publicClient } = configureChains([goerli], [publicProvider()]);
 const connectors = connectorsForWallets([
   {
     groupName: 'The Best',
@@ -37,9 +37,9 @@ const connectors = connectorsForWallets([
   },
 ]);
 
-const wagmiClient = createClient({
-  connectors,
-  provider,
+const config = createConfig({
+  publicClient,
+  connectors
 });
 
 // =============================================================================
@@ -220,7 +220,7 @@ const App = () => {
   const props = useProps();
 
   return (
-    <WagmiConfig client={wagmiClient}>
+    <WagmiConfig config={config}>
       <RainbowKitProvider chains={chains} theme={darkTheme()}>
         <Stateless {...props} />
       </RainbowKitProvider>
