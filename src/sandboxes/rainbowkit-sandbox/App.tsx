@@ -19,12 +19,10 @@ import {
 } from 'wagmi';
 import { publicProvider } from 'wagmi/providers/public';
 import { goerli } from 'wagmi/chains'
+import { parseGwei } from 'viem';
 
 import { TLog } from './types';
-
 import { Logs, Sidebar } from './components';
-import { utils } from 'ethers';
-
 // =============================================================================
 // Rainbowkit Configuration
 // =============================================================================
@@ -61,10 +59,6 @@ const StyledApp = styled.div`
 
 const MESSAGE = 'To avoid digital dognappers, sign below to authenticate with CryptoCorgis.';
 //0x0000...000 common for burning ETH
-const TRANSACTION_CONFIG = {
-  chainId: goerli.id,
-  request: { value: utils.parseUnits('1', 'wei'), to: '0x0000000000000000000000000000000000000000' },
-};
 // =============================================================================
 // Typedefs
 // =============================================================================
@@ -171,7 +165,10 @@ const Stateless = React.memo((props: Props) => {
     },
   });
 
-  const { config } = usePrepareSendTransaction(TRANSACTION_CONFIG);
+  const { config } = usePrepareSendTransaction({
+    to: '0x0000000000000000000000000000000000000000', // Common for burning ETH
+    value: parseGwei('1', 'wei'), 
+  })
   const { sendTransaction } = useSendTransaction({
     ...config,
     onSettled(data, error) {
@@ -199,7 +196,7 @@ const Stateless = React.memo((props: Props) => {
       },
       {
         name: 'Send Transaction (burn 1 wei on Goerli)',
-        onClick: () => sendTransaction(),
+        onClick: () => sendTransaction?.(),
       },
     ];
   }, [signMessage, sendTransaction]);
