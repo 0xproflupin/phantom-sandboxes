@@ -3,27 +3,19 @@
  * This will trigger a re-install of the dependencies in the sandbox – which should fix things right up.
  * Alternatively, you can fork this sandbox to refresh the dependencies manually.
  */
-import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import styled from 'styled-components';
 
-import { getProvider, sendTransaction } from './utils';
-
 import { TLog } from './types';
-
 import { Logs, Sidebar } from './components';
 
-import { useWeb3React, Web3ReactProvider } from '@web3-react/core'
-import { InjectedConnector } from "@web3-react/injected-connector"
-import { Web3Provider } from '@ethersproject/providers'
+import { useWeb3React, Web3ReactProvider } from '@web3-react/core';
+import { Web3Provider } from '@ethersproject/providers';
 // import { PhantomConnector } from "web3-react-v6-phantom"
-import { PhantomConnector } from "./PhantomConnector"
-
-const injected = new InjectedConnector({
-  supportedChainIds: [1]
-});
+import { PhantomConnector } from './PhantomConnector';
 
 const phantom = new PhantomConnector({
-  supportedChainIds: [1]
+  supportedChainIds: [1],
 });
 
 // =============================================================================
@@ -45,21 +37,23 @@ const StyledApp = styled.div`
 
 declare global {
   interface Window {
-    ethereum: any
+    ethereum: any;
   }
 }
-let accounts = [];
 const message = 'To avoid digital dognappers, sign below to authenticate with CryptoCorgis.';
-const sleep = (timeInMS) => new Promise((resolve) => setTimeout(resolve, timeInMS));
 
 // =============================================================================
 // Typedefs
 // =============================================================================
 
-export type ConnectedMethods =
+export type SidebarMethods =
   | {
       name: string;
       onClick: () => Promise<string>;
+    }
+  | {
+      name: string;
+      onClick: () => Promise<void>;
     }
   | {
       name: string;
@@ -82,7 +76,6 @@ interface Props {
  * The fun stuff!
  */
 const useProps = (): Props => {
-  const [provider, setProvider] = useState<Web3Provider | null>(null);
   const [logs, setLogs] = useState<TLog[]>([]);
 
   const createLog = useCallback(
@@ -109,45 +102,17 @@ const useProps = (): Props => {
 
 const StatelessApp = React.memo((props: Props) => {
   const { logs, clearLogs, createLog } = props;
-  const { active, library, activate, account } = useWeb3React();
-  let prevAccount = useRef(account)
-  useEffect(() => {
-    // createLog({
-      // status: 'success',
-      // method: 'connect',
-      // message: `Connected to app with account: ${account}}`,
-    // });
-  prevAccount.current = account
-  }, [account, createLog])
-
-  // console.log(active, library, activate);
-
-  const handleConnect = () => {
-    try {
-      activate(phantom)
-      createLog({
-        status: 'success',
-        method: 'connect',
-        message: `Connected to app`,
-      });
-    } catch(e) {
-      createLog({
-        status: 'error',
-        method: 'connect',
-        message: e.message,
-      });
-    }
-  }
+  const { library, activate, deactivate } = useWeb3React();
 
   const handleDisconnect = () => {
     try {
-      phantom.deactivate();
+      deactivate();
       createLog({
         status: 'warning',
         method: 'disconnect',
         message: 'user disconnected wallet',
       });
-    } catch(e) {
+    } catch (e) {
       createLog({
         status: 'error',
         method: 'disconnect',
@@ -155,7 +120,7 @@ const StatelessApp = React.memo((props: Props) => {
       });
       console.error(e);
     }
-  }
+  };
 
   const handleSignMessage = async () => {
     try {
@@ -166,7 +131,7 @@ const StatelessApp = React.memo((props: Props) => {
         method: 'signMessage',
         message: `Message signed: ${sig}`,
       });
-    } catch(e) {
+    } catch (e) {
       createLog({
         status: 'error',
         method: 'signMessage',
@@ -175,29 +140,45 @@ const StatelessApp = React.memo((props: Props) => {
     }
   };
 
-  const connectedMethods =
-     [
-      {
-        name: 'Connect',
-        onClick: handleConnect,
-      },
-      {
-        name: 'Deactivate',
-        onClick: handleDisconnect,
-      },
-      {
-        name: "Sign Message",
-        onClick: handleSignMessage
-      }
-    ];
+  const handleConnect = async () => {
+    try {
+      await activate(phantom);
+      createLog({
+        status: 'success',
+        method: 'connect',
+        message: `Connected to app`,
+      });
+    } catch (e) {
+      createLog({
+        status: 'error',
+        method: 'connect',
+        message: e.message,
+      });
+    }
+  };
+
+  const connectedMethods = [
+    {
+      name: 'Deactivate',
+      onClick: handleDisconnect,
+    },
+    {
+      name: 'Sign Message',
+      onClick: handleSignMessage,
+    },
+  ];
+  const unConnectedMethods = [
+    {
+      name: 'Connect To Phantom',
+      onClick: handleConnect,
+    },
+  ];
 
   return (
-    
     <StyledApp>
-      <Sidebar connectedMethods={connectedMethods} />
+      <Sidebar unConnectedMethods={unConnectedMethods} connectedMethods={connectedMethods} />
       <Logs logs={logs} clearLogs={clearLogs} />
     </StyledApp>
-      
   );
 });
 
@@ -209,17 +190,16 @@ const App = () => {
   const props = useProps();
 
   function getLibrary(provider: any): Web3Provider {
-    const library = new Web3Provider(provider)
-    library.pollingInterval = 12000
-    return library
+    const library = new Web3Provider(provider);
+    library.pollingInterval = 12000;
+    return library;
   }
-  
 
   return (
     <Web3ReactProvider getLibrary={getLibrary}>
       <StatelessApp {...props} />;
     </Web3ReactProvider>
-  )
+  );
 };
 
 export default App;

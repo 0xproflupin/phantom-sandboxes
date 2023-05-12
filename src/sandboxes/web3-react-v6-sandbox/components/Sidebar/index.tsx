@@ -7,7 +7,8 @@ import { GRAY, REACT_GRAY, PURPLE, WHITE, DARK_GRAY } from '../../constants';
 import { hexToRGB } from '../../utils';
 
 import Button from '../Button';
-import { ConnectedMethods } from '../../App';
+import { SidebarMethods } from '../../App';
+import { useWeb3React } from '@web3-react/core';
 
 // =============================================================================
 // Styled Components
@@ -184,7 +185,8 @@ const Menu = styled.div``;
 // =============================================================================
 
 interface Props {
-  connectedMethods: ConnectedMethods[];
+  connectedMethods: SidebarMethods[];
+  unConnectedMethods: SidebarMethods[];
 }
 
 // =============================================================================
@@ -192,7 +194,8 @@ interface Props {
 // =============================================================================
 
 const Sidebar = React.memo((props: Props) => {
-  const { connectedMethods } = props;
+  const { connectedMethods, unConnectedMethods } = props;
+  const { account, active } = useWeb3React();
   const [menuOpen, setMenuOpen] = React.useState(false);
 
   const toggleMenu = () => {
@@ -204,34 +207,26 @@ const Sidebar = React.memo((props: Props) => {
       <Body>
         <Menu>
           <MenuButton onClick={toggleMenu}>Sandboxes</MenuButton>
-            {menuOpen && (
-              <MenuContainer>
-                <NavigationLink to="/sol-sandbox">Solana Sandbox</NavigationLink>
-                <NavigationLink to="/eth-sandbox">Ethereum Sandbox</NavigationLink>
-                <NavigationLink to="/multi-chain-sandbox">Multi-Chain Sandbox</NavigationLink>
-                <NavigationLink to="/sol-adapter-sandbox">Solana Adapter Sandbox</NavigationLink>
-                <NavigationLink to="/experimental-sandbox">Experimental Sandbox</NavigationLink>
-              </MenuContainer>
-            )}
+          {menuOpen && (
+            <MenuContainer>
+              <NavigationLink to="/sol-sandbox">Solana Sandbox</NavigationLink>
+              <NavigationLink to="/eth-sandbox">Ethereum Sandbox</NavigationLink>
+              <NavigationLink to="/multi-chain-sandbox">Multi-Chain Sandbox</NavigationLink>
+              <NavigationLink to="/sol-adapter-sandbox">Solana Adapter Sandbox</NavigationLink>
+              <NavigationLink to="/experimental-sandbox">Experimental Sandbox</NavigationLink>
+            </MenuContainer>
+          )}
         </Menu>
         <Link>
           <img src="https://phantom.app/img/phantom-logo.svg" alt="Phantom" width="200" />
           <Subtitle>Web3-React-V6 Sandbox</Subtitle>
         </Link>
-        <>
-
-            {connectedMethods.map((method, i) => (
-              <Button key={`${method.name}-${i}`} onClick={method.onClick}>
-                {method.name}
-              </Button>
-            ))}
-          </>
-        {/* {address ? (
+        {active ? (
           // connected
           <>
             <div>
               <Pre>Connected as</Pre>
-              <Badge>{address}</Badge>
+              <Badge>{account}</Badge>
               <Divider />
             </div>
             {connectedMethods.map((method, i) => (
@@ -242,8 +237,14 @@ const Sidebar = React.memo((props: Props) => {
           </>
         ) : (
           // not connected
-          <Button onClick={connect}>Connect to Phantom</Button>
-        )} */}
+          <>
+            {unConnectedMethods.map((method, i) => (
+              <Button key={`${method.name}-${i}`} onClick={method.onClick}>
+                {method.name}
+              </Button>
+            ))}
+          </>
+        )}
       </Body>
       {/* 😊 💕  */}
       <Tag>
