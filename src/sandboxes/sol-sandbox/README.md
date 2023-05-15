@@ -1,5 +1,3 @@
-# Phantom Wallet Sandbox
+# Phantom Solana Sandbox
 
-> A CodeSandbox for learning how to interact with Phantom Wallet
-
-[Play with the sandbox in full view](https://r3byv.csb.app/)
+[https://phantom-sandboxes.vercel.app/sol-sandbox](https://phantom-sandboxes.vercel.app/sol-sandbox)

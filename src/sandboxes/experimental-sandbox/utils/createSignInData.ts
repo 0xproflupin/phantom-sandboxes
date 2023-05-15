@@ -1,18 +1,46 @@
 import { SignInData } from '../types';
 
-const createSignInData = async (): Promise<SignInData> => {
+export const createSignInData = async (address?: string): Promise<SignInData> => {
+  const now: Date = new Date();
+  const uri = window.location.href
+  const currentUrl = new URL(uri);
+  const domain = currentUrl.hostname.replace(/^www\./, '');
+
+  // Convert the Date object to a string
+  const currentDateTime = now.toISOString();
   const signInData: SignInData = {
-    domain: "https://example.com",
-    address: "Fn9A5Ge92QkwrYAASFv5R7nh9VMve9ssERPfhaNPF3Lj",
-    statement: "Sign-in to connect!",
-    uri: "https://example.com",
+    domain,
+    statement: "Clicking Sign or Approve only means you have proved this wallet is owned by you. This request will not trigger any blockchain transaction or cost any gas fee. Use of our website and service are subject to our Terms of Service: https://magiceden.io/terms-of-service.pdf and Privacy Policy: https://magiceden.io/privacy-policy.pdf Clicking Sign or Approve only means you have proved this wallet is owned by you. This request will not trigger any blockchain transaction or cost any gas fee. Use of our website and service are subject to our Terms of Service: https://magiceden.io/terms-of-service.pdf and Privacy Policy: https://magiceden.io/privacy-policy.pdf",
+    uri,
     version: "1",
-    nonce: "1",
+    nonce: "oBbLoEldZs",
     chain: "mainnet",
-    issuedAt: "2021-09-30T16:25:24Z",
+    issuedAt: currentDateTime,
+    resources: ["https://example.com", "https://phantom.app/"]
   };
+  if (address) {
+    signInData.address = address;
+  }
 
   return signInData;
 };
 
-export default createSignInData;
+export const createSignInErrorData = async (address: string): Promise<SignInData> => {
+  const now: Date = new Date();
+
+  // Convert the Date object to a string
+  const currentDateTime = now.toISOString();
+  const signInData: SignInData = {
+    domain: "phishing.com",
+    address: "AvQTW8uhcLRd3Q6vvu5taRA66JfMsbQFasVLETAWwsdt",
+    statement: "Sign-in to connect!",
+    uri: "https://www.phishing.com",
+    version: "1",
+    nonce: "oBbLoEldZs",
+    chain: "devnet",
+    issuedAt: currentDateTime,
+    resources: ["https://example.com", "https://phantom.app/"]
+  };
+
+  return signInData;
+};

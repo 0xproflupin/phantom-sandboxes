@@ -36,11 +36,6 @@ const StyledApp = styled.div`
 // Constants
 // =============================================================================
 
-declare global {
-  interface Window {
-    ethereum: any;
-  }
-}
 const message = 'To avoid digital dognappers, sign below to authenticate with CryptoCorgis.';
 const TX = {
   to: '0x0000000000000000000000000000000000000000',

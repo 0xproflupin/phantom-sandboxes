@@ -1,5 +1,5 @@
+import { WindowProvider } from '@wagmi/core';
 import { providers } from 'ethers';
-import { WindowProvider } from 'wagmi';
 
 type PhantomEvent = 'connect' | 'disconnect' | 'accountChanged';
 
@@ -24,6 +24,8 @@ export type Web3Provider = providers.Web3Provider;
 
 declare global {
   interface Window {
-    ethereum: WindowProvider
+    phantom: {
+      ethereum: WindowProvider
+    }
   }
 }

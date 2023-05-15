@@ -29,11 +29,6 @@ const StyledApp = styled.div`
 // Constants
 // =============================================================================
 
-declare global {
-  interface Window {
-    ethereum: any
-  }
-}
 let accounts = [];
 const message = 'To avoid digital dognappers, sign below to authenticate with CryptoCorgis.';
 const sleep = (timeInMS) => new Promise((resolve) => setTimeout(resolve, timeInMS));

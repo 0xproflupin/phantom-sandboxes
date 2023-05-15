@@ -1,17 +1,14 @@
 import React from 'react';
-import { PublicKey } from '@solana/web3.js';
 import styled from 'styled-components';
 import { NavLink } from 'react-router-dom';
-import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
-
 import { GRAY, REACT_GRAY, PURPLE, WHITE, DARK_GRAY } from '../../constants';
 
 import { hexToRGB } from '../../utils';
 
 import Button from '../Button';
 import { ConnectedMethods } from '../../App';
-
-require('@solana/wallet-adapter-react-ui/styles.css');
+import { useAccount, useConnect } from 'wagmi';
+import { goerli } from 'viem/chains';
 
 // =============================================================================
 // Styled Components
@@ -73,6 +70,12 @@ const Pre = styled.pre`
   margin-bottom: 5px;
 `;
 
+const Divider = styled.div`
+  border: 1px solid ${DARK_GRAY};
+  height: 1px;
+  margin: 20px 0;
+`;
+
 const Badge = styled.div`
   margin: 0;
   padding: 10px;
@@ -101,12 +104,6 @@ const Badge = styled.div`
     color: ${WHITE};
     background-color: ${hexToRGB(PURPLE, 0.5)};
   }
-`;
-
-const Divider = styled.div`
-  border: 1px solid ${DARK_GRAY};
-  height: 1px;
-  margin: 20px 0;
 `;
 
 const Tag = styled.p`
@@ -188,9 +185,7 @@ const Menu = styled.div``;
 // =============================================================================
 
 interface Props {
-  publicKey?: PublicKey;
   connectedMethods: ConnectedMethods[];
-  connect: () => Promise<void>;
 }
 
 // =============================================================================
@@ -198,8 +193,10 @@ interface Props {
 // =============================================================================
 
 const Sidebar = React.memo((props: Props) => {
-  const { publicKey, connectedMethods } = props;
+  const { connectedMethods } = props;
   const [menuOpen, setMenuOpen] = React.useState(false);
+  const { address } = useAccount();
+  const { connect, connectors, isLoading, pendingConnector } = useConnect();
 
   const toggleMenu = () => {
     setMenuOpen(!menuOpen);
@@ -210,29 +207,28 @@ const Sidebar = React.memo((props: Props) => {
       <Body>
         <Menu>
           <MenuButton onClick={toggleMenu}>Sandboxes</MenuButton>
-            {menuOpen && (
-              <MenuContainer>
-                <NavigationLink to="/sol-sandbox">Solana Sandbox</NavigationLink>
-                <NavigationLink to="/eth-sandbox">Ethereum Sandbox</NavigationLink>
-                <NavigationLink to="/multi-chain-sandbox">Multi-Chain Sandbox</NavigationLink>
-                <NavigationLink to="/sol-adapter-sandbox">Solana Adapter Sandbox</NavigationLink>
-                <NavigationLink to="/rainbowkit-sandbox">Rainbowkit Sandbox</NavigationLink>
-                <NavigationLink to="/wagmi-sandbox">Wagmi Sandbox</NavigationLink>
-                <NavigationLink to="/experimental-sandbox">Experimental Sandbox</NavigationLink>
-              </MenuContainer>
-            )}
+          {menuOpen && (
+            <MenuContainer>
+              <NavigationLink to="/sol-sandbox">Solana Sandbox</NavigationLink>
+              <NavigationLink to="/eth-sandbox">Ethereum Sandbox</NavigationLink>
+              <NavigationLink to="/multi-chain-sandbox">Multi-Chain Sandbox</NavigationLink>
+              <NavigationLink to="/sol-adapter-sandbox">Solana Adapter Sandbox</NavigationLink>
+              <NavigationLink to="/rainbowkit-sandbox">Rainbowkit Sandbox</NavigationLink>
+              <NavigationLink to="/wagmi-sandbox">Wagmi Sandbox</NavigationLink>
+              <NavigationLink to="/experimental-sandbox">Experimental Sandbox</NavigationLink>
+            </MenuContainer>
+          )}
         </Menu>
         <Link>
           <img src="https://phantom.app/img/phantom-logo.svg" alt="Phantom" width="200" />
           <Subtitle>CodeSandbox</Subtitle>
         </Link>
-        <WalletMultiButton />  
-        {publicKey ? (
+        {address ? (
           // connected
           <>
             <div>
               <Pre>Connected as</Pre>
-              <Badge>{publicKey.toBase58()}</Badge>
+              <Badge>{address}</Badge>
               <Divider />
             </div>
             {connectedMethods.map((method, i) => (
@@ -243,7 +239,14 @@ const Sidebar = React.memo((props: Props) => {
           </>
         ) : (
           // not connected
-          <></>
+          <>
+            {connectors.map((connector) => (
+              <Button disabled={!connector.ready} key={connector.id} onClick={() => connect({ connector, chainId: goerli.id })}>
+                Connect to {connector.name}
+                {isLoading && pendingConnector?.id === connector.id && ' (connecting)'}
+              </Button>
+            ))}
+          </>
         )}
       </Body>
       {/* 😊 💕  */}

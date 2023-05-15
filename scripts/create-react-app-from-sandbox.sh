@@ -8,7 +8,7 @@ then
 fi
 
 # Move to src
-cd ../src
+cd src
 
 # Make sandbox react apps directory
 mkdir sandbox_react_apps
@@ -37,17 +37,7 @@ mv src/dependencies.json package.json
 mv src/README.md .
 
 # Add additional fields to package.json
-jq '.name = "sandboxes" | .version = "0.1.0" | .private = true | .eslintConfig = {
-  "extends": [
-    "react-app",
-    "react-app/jest"
-  ]
-} | .browserslist = [">0.2%", "not dead", "not ie <= 11", "not op_mini all"] | .scripts = {
-  "start": "react-scripts start",
-  "build": "react-scripts build",
-  "test": "react-scripts test",
-  "eject": "react-scripts eject"
-}' package.json > tmp_package.json && mv tmp_package.json package.json
+node -e 'const fs = require("fs"); const pkg = JSON.parse(fs.readFileSync("package.json", "utf-8")); pkg.name = "sandboxes"; pkg.version = "0.1.0"; pkg.private = true; pkg.eslintConfig = { "extends": ["react-app", "react-app/jest"] }; pkg.browserslist = [">0.2%", "not dead", "not ie <= 11", "not op_mini all"]; pkg.scripts = { "start": "react-scripts start", "build": "react-scripts build", "test": "react-scripts test", "eject": "react-scripts eject" }; fs.writeFileSync("package.json", JSON.stringify(pkg, null, 2));'
 
 # Create public folder with index.html
 mkdir public
