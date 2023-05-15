@@ -195,7 +195,7 @@ interface Props {
 
 const Sidebar = React.memo((props: Props) => {
   const { connectedMethods, unConnectedMethods } = props;
-  const { account, active } = useWeb3React();
+  const { account, active, chainId } = useWeb3React();
   const [menuOpen, setMenuOpen] = React.useState(false);
 
   const toggleMenu = () => {
@@ -221,7 +221,7 @@ const Sidebar = React.memo((props: Props) => {
           <img src="https://phantom.app/img/phantom-logo.svg" alt="Phantom" width="200" />
           <Subtitle>Web3-React-V6 Sandbox</Subtitle>
         </Link>
-        {active ? (
+        {active && chainId === 0x5 ? (
           // connected
           <>
             <div>

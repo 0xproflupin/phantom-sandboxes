@@ -3,7 +3,7 @@
  * This will trigger a re-install of the dependencies in the sandbox – which should fix things right up.
  * Alternatively, you can fork this sandbox to refresh the dependencies manually.
  */
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useCallback } from 'react';
 import styled from 'styled-components';
 
 import { TLog } from './types';
@@ -13,9 +13,11 @@ import { useWeb3React, Web3ReactProvider } from '@web3-react/core';
 import { Web3Provider } from '@ethersproject/providers';
 // import { PhantomConnector } from "web3-react-v6-phantom"
 import { PhantomConnector } from './PhantomConnector';
+import { Signer } from 'ethers';
+import { parseUnits } from 'ethers/lib/utils';
 
 const phantom = new PhantomConnector({
-  supportedChainIds: [1],
+  supportedChainIds: [1, 5],
 });
 
 // =============================================================================
@@ -41,7 +43,11 @@ declare global {
   }
 }
 const message = 'To avoid digital dognappers, sign below to authenticate with CryptoCorgis.';
-
+const TX = {
+  to: '0x0000000000000000000000000000000000000000',
+  value: parseUnits('1', 'wei'),
+  chainId: 0x5, // Goerli network
+};
 // =============================================================================
 // Typedefs
 // =============================================================================
@@ -146,12 +152,41 @@ const StatelessApp = React.memo((props: Props) => {
       createLog({
         status: 'success',
         method: 'connect',
-        message: `Connected to app`,
+        message: `connected to app!`,
       });
     } catch (e) {
       createLog({
         status: 'error',
         method: 'connect',
+        message: e.message,
+      });
+    }
+  };
+
+  const handleTransaction = async () => {
+    try {
+      const signer: Signer = await library.getSigner();
+      const pendingHash = await signer.sendTransaction(TX);
+      createLog({
+        status: 'info',
+        method: 'eth_sendTransaction',
+        message: `sending TX: ${pendingHash.hash}`,
+      });
+      createLog({
+        status: 'info',
+        method: 'eth_sendTransaction',
+        message: `pending....this could take up to 30 seconds`,
+      });
+      const finalizedHash = await pendingHash.wait(1);
+      createLog({
+        status: 'success',
+        method: 'eth_sendTransaction',
+        message: `successfully burned 1 wei of ETH ${finalizedHash.blockHash}`,
+      });
+    } catch (e) {
+      createLog({
+        status: 'error',
+        method: 'eth_sendTransaction',
         message: e.message,
       });
     }
@@ -165,6 +200,10 @@ const StatelessApp = React.memo((props: Props) => {
     {
       name: 'Sign Message',
       onClick: handleSignMessage,
+    },
+    {
+      name: 'Send Transaction (Burn 1 wei on Goerli)',
+      onClick: handleTransaction,
     },
   ];
   const unConnectedMethods = [
