@@ -11,8 +11,7 @@ import { Logs, Sidebar } from './components';
 
 import { useWeb3React, Web3ReactProvider } from '@web3-react/core';
 import { Web3Provider } from '@ethersproject/providers';
-// import { PhantomConnector } from "web3-react-v6-phantom"
-import { PhantomConnector } from './PhantomConnector';
+import { PhantomConnector } from "web3-react-v6-phantom"
 import { Signer } from 'ethers';
 import { parseUnits } from 'ethers/lib/utils';
 
