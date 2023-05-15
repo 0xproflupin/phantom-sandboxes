@@ -90,7 +90,7 @@ const useProps = (): Props => {
   useEffect(() => {
     if (!provider) return;
 
-    window.ethereum.on('connect', (connectionInfo: { chainId: string }) => {
+    window.phantom.ethereum.on('connect', (connectionInfo: { chainId: string }) => {
       createLog({
         status: 'success',
         method: 'connect',
@@ -98,7 +98,7 @@ const useProps = (): Props => {
       });
     });
 
-    window.ethereum.on('disconnect', () => {
+    window.phantom.ethereum.on('disconnect', () => {
       createLog({
         status: 'warning',
         method: 'disconnect',
@@ -106,7 +106,7 @@ const useProps = (): Props => {
       });
     });
 
-    window.ethereum.on('accountsChanged', (newAccounts: String[]) => {
+    window.phantom.ethereum.on('accountsChanged', (newAccounts: String[]) => {
       if (newAccounts) {
         createLog({
           status: 'info',
