@@ -1,5 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
+import { useWeb3React } from '@web3-react/core';
 
 import { TLog } from '../../types';
 
@@ -56,6 +57,7 @@ interface Props {
 
 const Logs = React.memo((props: Props) => {
   const { logs, clearLogs } = props;
+  const { account } = useWeb3React()
 
   return (
     <StyledSection>
@@ -70,7 +72,7 @@ const Logs = React.memo((props: Props) => {
         <Row>
           <span>{'>'}</span>
           <PlaceholderMessage>
-            {/* {address ? (
+             {account ? (
               // connected
               <>
                 Click a button and watch magic happen...{' '}
@@ -86,7 +88,7 @@ const Logs = React.memo((props: Props) => {
                   👻
                 </span>
               </>
-            )} */}
+            )} 
           </PlaceholderMessage>
         </Row>
       )}

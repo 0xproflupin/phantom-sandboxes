@@ -37,7 +37,7 @@ const StyledApp = styled.div`
 // =============================================================================
 
 const message = 'To avoid digital dognappers, sign below to authenticate with CryptoCorgis.';
-const TX = {
+const tx = {
   to: '0x0000000000000000000000000000000000000000',
   value: parseUnits('1', 'wei'),
   chainId: 0x5, // Goerli network
@@ -61,7 +61,6 @@ export type SidebarMethods =
     };
 
 interface Props {
-  // connectedMethods: ConnectedMethods[];
   logs: TLog[];
   clearLogs: () => void;
   createLog: (log: TLog) => void;
@@ -71,10 +70,6 @@ interface Props {
 // Hooks
 // =============================================================================
 
-/**
- * @DEVELOPERS
- * The fun stuff!
- */
 const useProps = (): Props => {
   const [logs, setLogs] = useState<TLog[]>([]);
 
@@ -110,7 +105,7 @@ const StatelessApp = React.memo((props: Props) => {
       createLog({
         status: 'warning',
         method: 'disconnect',
-        message: 'user disconnected wallet',
+        message: 'User disconnected wallet',
       });
     } catch (e) {
       createLog({
@@ -146,7 +141,7 @@ const StatelessApp = React.memo((props: Props) => {
       createLog({
         status: 'success',
         method: 'connect',
-        message: `connected to app!`,
+        message: `Connected to app!`,
       });
     } catch (e) {
       createLog({
@@ -160,22 +155,22 @@ const StatelessApp = React.memo((props: Props) => {
   const handleTransaction = async () => {
     try {
       const signer: Signer = await library.getSigner();
-      const pendingHash = await signer.sendTransaction(TX);
+      const pendingHash = await signer.sendTransaction(tx);
       createLog({
         status: 'info',
         method: 'eth_sendTransaction',
-        message: `sending TX: ${pendingHash.hash}`,
+        message: `Sending TX: ${pendingHash.hash}`,
       });
       createLog({
         status: 'info',
         method: 'eth_sendTransaction',
-        message: `pending....this could take up to 30 seconds`,
+        message: `Pending....this could take up to 30 seconds`,
       });
       const finalizedHash = await pendingHash.wait(1);
       createLog({
         status: 'success',
         method: 'eth_sendTransaction',
-        message: `successfully burned 1 wei of ETH ${finalizedHash.blockHash}`,
+        message: `Successfully burned 1 wei of ETH ${finalizedHash.blockHash}`,
       });
     } catch (e) {
       createLog({
