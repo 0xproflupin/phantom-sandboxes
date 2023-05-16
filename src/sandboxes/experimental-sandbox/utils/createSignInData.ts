@@ -14,7 +14,7 @@ export const createSignInData = async (address?: string): Promise<SignInData> =>
     uri,
     version: "1",
     nonce: "oBbLoEldZs",
-    chain: "mainnet",
+    chain: "solana:mainnet",
     issuedAt: currentDateTime,
     resources: ["https://example.com", "https://phantom.app/"]
   };
@@ -37,7 +37,7 @@ export const createSignInErrorData = async (address: string): Promise<SignInData
     uri: "https://www.phishing.com",
     version: "1",
     nonce: "oBbLoEldZs",
-    chain: "devnet",
+    chain: "solana:devnet",
     issuedAt: currentDateTime,
     resources: ["https://example.com", "https://phantom.app/"]
   };
