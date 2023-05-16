@@ -9,15 +9,16 @@ import styled from 'styled-components';
 import { TLog } from './types';
 import { Logs, Sidebar } from './components';
 
-import { useWeb3React, Web3ReactProvider } from '@web3-react/core';
-import { Web3Provider } from '@ethersproject/providers';
-import { PhantomConnector } from "web3-react-v6-phantom"
 import { Signer } from 'ethers';
 import { parseUnits } from 'ethers/lib/utils';
+import { Web3ReactProvider, Web3ReactHooks, Web3ReactSelectedHooks } from '@web3-react/core/latest'
+import { Connector } from '@web3-react/types/latest'
 
-const phantom = new PhantomConnector({
-  supportedChainIds: [1, 5],
-});
+import allConnections from './utils/connectors'
+// =============================================================================
+// Web3-React Connector Config
+// =============================================================================
+const connections: [Connector, Web3ReactHooks][] = allConnections.map(([connector, hooks]) => [connector, hooks])
 
 // =============================================================================
 // Styled Components
@@ -186,10 +187,41 @@ const StatelessApp = React.memo((props: Props) => {
     }
   };
 
+  const handleToggleConnect = (isActive: boolean, isActivating: boolean, connector: Connector) => {
+    if (isActive) {
+      if(connector?.deactivate) {
+        void connector.deactivate()
+        createLog({
+          status: 'success',
+          method: 'disconnect',
+          message: 'wallet disconnected'
+        })
+      } else {
+        void connector.resetState()
+      }
+    }
+    else if (!isActivating) {
+        createLog({
+          status: 'info',
+          method: 'connect',
+          message: 'connecting...'
+        })
+        Promise.resolve(connector.activate(1))
+        .catch((e) => {
+          connector.resetState()
+        createLog({
+          status: 'error',
+          method: 'connect',
+          message: e.message
+        })
+        }) 
+      }
+  }
+
   const connectedMethods = [
     {
       name: 'Deactivate',
-      onClick: handleDisconnect,
+      onClick: handleToggleConnect,
     },
     {
       name: 'Sign Message',
@@ -203,7 +235,7 @@ const StatelessApp = React.memo((props: Props) => {
   const unConnectedMethods = [
     {
       name: 'Connect To Phantom',
-      onClick: handleConnect,
+      onClick: handleToggleConnect,
     },
   ];
 
@@ -221,15 +253,9 @@ const StatelessApp = React.memo((props: Props) => {
 
 const App = () => {
   const props = useProps();
-
-  function getLibrary(provider: any): Web3Provider {
-    const library = new Web3Provider(provider);
-    library.pollingInterval = 12000;
-    return library;
-  }
-
+  
   return (
-    <Web3ReactProvider getLibrary={getLibrary}>
+    <Web3ReactProvider connectors={connections}>
       <StatelessApp {...props} />;
     </Web3ReactProvider>
   );
