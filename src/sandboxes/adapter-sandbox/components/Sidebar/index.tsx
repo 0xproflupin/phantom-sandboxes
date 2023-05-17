@@ -219,6 +219,7 @@ const Sidebar = React.memo((props: Props) => {
                 <NavigationLink to="/rainbowkit-sandbox">Rainbowkit Sandbox</NavigationLink>
                 <NavigationLink to="/wagmi-sandbox">Wagmi Sandbox</NavigationLink>
                 <NavigationLink to="/web3-react-v6-sandbox">Web3 React V6 Sandbox</NavigationLink>
+                <NavigationLink to="/web3-react-v8-sandbox">Web3 React V8 Sandbox</NavigationLink>
                 <NavigationLink to="/experimental-sandbox">Experimental Sandbox</NavigationLink>
               </MenuContainer>
             )}
