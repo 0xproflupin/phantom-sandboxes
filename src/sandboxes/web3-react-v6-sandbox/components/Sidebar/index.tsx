@@ -1,14 +1,14 @@
 import React from 'react';
 import styled from 'styled-components';
 import { NavLink } from 'react-router-dom';
-import { ConnectButton } from '@rainbow-me/rainbowkit';
 
 import { GRAY, REACT_GRAY, PURPLE, WHITE, DARK_GRAY } from '../../constants';
 
 import { hexToRGB } from '../../utils';
 
 import Button from '../Button';
-import { ConnectedMethods } from '../../App';
+import { SidebarMethods } from '../../App';
+import { useWeb3React } from '@web3-react/core';
 
 // =============================================================================
 // Styled Components
@@ -68,6 +68,36 @@ const Subtitle = styled.h5`
 
 const Pre = styled.pre`
   margin-bottom: 5px;
+`;
+
+const Badge = styled.div`
+  margin: 0;
+  padding: 10px;
+  width: 100%;
+  color: ${PURPLE};
+  background-color: ${hexToRGB(PURPLE, 0.2)};
+  font-size: 14px;
+  border-radius: 6px;
+  @media (max-width: 400px) {
+    width: 280px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  @media (max-width: 320px) {
+    width: 220px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  ::selection {
+    color: ${WHITE};
+    background-color: ${hexToRGB(PURPLE, 0.5)};
+  }
+  ::-moz-selection {
+    color: ${WHITE};
+    background-color: ${hexToRGB(PURPLE, 0.5)};
+  }
 `;
 
 const Divider = styled.div`
@@ -155,8 +185,8 @@ const Menu = styled.div``;
 // =============================================================================
 
 interface Props {
-  address?: string;
-  connectedMethods: ConnectedMethods[];
+  connectedMethods: SidebarMethods[];
+  unConnectedMethods: SidebarMethods[];
 }
 
 // =============================================================================
@@ -164,7 +194,8 @@ interface Props {
 // =============================================================================
 
 const Sidebar = React.memo((props: Props) => {
-  const { connectedMethods, address } = props;
+  const { connectedMethods, unConnectedMethods } = props;
+  const { account, active, chainId } = useWeb3React();
   const [menuOpen, setMenuOpen] = React.useState(false);
 
   const toggleMenu = () => {
@@ -176,29 +207,29 @@ const Sidebar = React.memo((props: Props) => {
       <Body>
         <Menu>
           <MenuButton onClick={toggleMenu}>Sandboxes</MenuButton>
-            {menuOpen && (
-              <MenuContainer>
-                <NavigationLink to="/sol-sandbox">Solana Sandbox</NavigationLink>
-                <NavigationLink to="/eth-sandbox">Ethereum Sandbox</NavigationLink>
-                <NavigationLink to="/multi-chain-sandbox">Multi-Chain Sandbox</NavigationLink>
-                <NavigationLink to="/sol-adapter-sandbox">Solana Adapter Sandbox</NavigationLink>
-                <NavigationLink to="/rainbowkit-sandbox">Rainbowkit Sandbox</NavigationLink>
-                <NavigationLink to="/wagmi-sandbox">Wagmi Sandbox</NavigationLink>
-                <NavigationLink to="/web3-react-v6-sandbox">Web3 React V6 Sandbox</NavigationLink>
-                <NavigationLink to="/experimental-sandbox">Experimental Sandbox</NavigationLink>
-              </MenuContainer>
-            )}
+          {menuOpen && (
+            <MenuContainer>
+              <NavigationLink to="/sol-sandbox">Solana Sandbox</NavigationLink>
+              <NavigationLink to="/eth-sandbox">Ethereum Sandbox</NavigationLink>
+              <NavigationLink to="/multi-chain-sandbox">Multi-Chain Sandbox</NavigationLink>
+              <NavigationLink to="/sol-adapter-sandbox">Solana Adapter Sandbox</NavigationLink>
+              <NavigationLink to="/rainbowkit-sandbox">Rainbowkit Sandbox</NavigationLink>
+              <NavigationLink to="/wagmi-sandbox">Wagmi Sandbox</NavigationLink>
+              <NavigationLink to="/web3-react-v6-sandbox">Web3 React V6 Sandbox</NavigationLink>
+              <NavigationLink to="/experimental-sandbox">Experimental Sandbox</NavigationLink>
+            </MenuContainer>
+          )}
         </Menu>
         <Link>
           <img src="https://phantom.app/img/phantom-logo.svg" alt="Phantom" width="200" />
-          <Subtitle>CodeSandbox</Subtitle>
+          <Subtitle>Web3-React-V6 Sandbox</Subtitle>
         </Link>
-        {address ? (
+        {active && chainId === 0x5 ? (
           // connected
           <>
             <div>
               <Pre>Connected as</Pre>
-              <ConnectButton />
+              <Badge>{account}</Badge>
               <Divider />
             </div>
             {connectedMethods.map((method, i) => (
@@ -209,7 +240,13 @@ const Sidebar = React.memo((props: Props) => {
           </>
         ) : (
           // not connected
-          <ConnectButton />
+          <>
+            {unConnectedMethods.map((method, i) => (
+              <Button key={`${method.name}-${i}`} onClick={method.onClick}>
+                {method.name}
+              </Button>
+            ))}
+          </>
         )}
       </Body>
       {/* 😊 💕  */}

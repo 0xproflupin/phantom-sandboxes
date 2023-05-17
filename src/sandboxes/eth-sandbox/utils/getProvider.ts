@@ -7,8 +7,8 @@ import { providers } from "ethers";
 const getProvider = (): Web3Provider | undefined => {
   if ('phantom' in window) {
     const anyWindow: any = window;
-    const ethereum = anyWindow.ethereum
-    const provider = new providers.Web3Provider(ethereum)
+    const ethereumProvider = anyWindow.phantom.ethereum
+    const provider = new providers.Web3Provider(ethereumProvider)
 
     if (provider) {
       return provider;
