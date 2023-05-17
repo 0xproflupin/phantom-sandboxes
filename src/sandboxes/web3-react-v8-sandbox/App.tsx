@@ -6,19 +6,17 @@
 import React, { useState, useCallback } from 'react';
 import styled from 'styled-components';
 
-import { TLog } from './types';
+import { logProps, TLog } from './types';
 import { Logs, Sidebar } from './components';
 
-import { Signer } from 'ethers';
-import { parseUnits } from 'ethers/lib/utils';
-import { Web3ReactProvider, Web3ReactHooks, Web3ReactSelectedHooks } from '@web3-react/core/latest'
-import { Connector } from '@web3-react/types/latest'
+import { Web3ReactProvider, Web3ReactHooks, useWeb3React } from '@web3-react/core/latest';
+import { Connector } from '@web3-react/types/latest';
 
-import allConnections from './utils/connectors'
+import allConnections from './utils/connectors';
 // =============================================================================
 // Web3-React Connector Config
 // =============================================================================
-const connections: [Connector, Web3ReactHooks][] = allConnections.map(([connector, hooks]) => [connector, hooks])
+const connections: [Connector, Web3ReactHooks][] = allConnections.map(([connector, hooks]) => [connector, hooks]);
 
 // =============================================================================
 // Styled Components
@@ -34,23 +32,13 @@ const StyledApp = styled.div`
 `;
 
 // =============================================================================
-// Constants
-// =============================================================================
-
-const message = 'To avoid digital dognappers, sign below to authenticate with CryptoCorgis.';
-const TX = {
-  to: '0x0000000000000000000000000000000000000000',
-  value: parseUnits('1', 'wei'),
-  chainId: 0x5, // Goerli network
-};
-// =============================================================================
 // Typedefs
 // =============================================================================
 
 export type SidebarMethods =
   | {
       name: string;
-      onClick: () => Promise<string>;
+      onClick: (isActive: boolean, isActivating: boolean, connector: Connector) => void;
     }
   | {
       name: string;
@@ -61,22 +49,11 @@ export type SidebarMethods =
       onClick: () => void;
     };
 
-interface Props {
-  // connectedMethods: ConnectedMethods[];
-  logs: TLog[];
-  clearLogs: () => void;
-  createLog: (log: TLog) => void;
-}
-
 // =============================================================================
 // Hooks
 // =============================================================================
 
-/**
- * @DEVELOPERS
- * The fun stuff!
- */
-const useProps = (): Props => {
+export const useLogs = (): logProps => {
   const [logs, setLogs] = useState<TLog[]>([]);
 
   const createLog = useCallback(
@@ -97,168 +74,29 @@ const useProps = (): Props => {
   };
 };
 
-// =============================================================================
-// Stateless Component
-// =============================================================================
-
-const StatelessApp = React.memo((props: Props) => {
-  const { logs, clearLogs, createLog } = props;
-  const { library, activate, deactivate } = useWeb3React();
-
-  const handleDisconnect = () => {
-    try {
-      deactivate();
-      createLog({
-        status: 'warning',
-        method: 'disconnect',
-        message: 'user disconnected wallet',
-      });
-    } catch (e) {
-      createLog({
-        status: 'error',
-        method: 'disconnect',
-        message: e.message,
-      });
-      console.error(e);
-    }
-  };
-
-  const handleSignMessage = async () => {
-    try {
-      const signer = await library.getSigner();
-      const sig = await signer.signMessage(message);
-      createLog({
-        status: 'success',
-        method: 'signMessage',
-        message: `Message signed: ${sig}`,
-      });
-    } catch (e) {
-      createLog({
-        status: 'error',
-        method: 'signMessage',
-        message: e.message,
-      });
-    }
-  };
-
-  const handleConnect = async () => {
-    try {
-      await activate(phantom);
-      createLog({
-        status: 'success',
-        method: 'connect',
-        message: `connected to app!`,
-      });
-    } catch (e) {
-      createLog({
-        status: 'error',
-        method: 'connect',
-        message: e.message,
-      });
-    }
-  };
-
-  const handleTransaction = async () => {
-    try {
-      const signer: Signer = await library.getSigner();
-      const pendingHash = await signer.sendTransaction(TX);
-      createLog({
-        status: 'info',
-        method: 'eth_sendTransaction',
-        message: `sending TX: ${pendingHash.hash}`,
-      });
-      createLog({
-        status: 'info',
-        method: 'eth_sendTransaction',
-        message: `pending....this could take up to 30 seconds`,
-      });
-      const finalizedHash = await pendingHash.wait(1);
-      createLog({
-        status: 'success',
-        method: 'eth_sendTransaction',
-        message: `successfully burned 1 wei of ETH ${finalizedHash.blockHash}`,
-      });
-    } catch (e) {
-      createLog({
-        status: 'error',
-        method: 'eth_sendTransaction',
-        message: e.message,
-      });
-    }
-  };
-
-  const handleToggleConnect = (isActive: boolean, isActivating: boolean, connector: Connector) => {
-    if (isActive) {
-      if(connector?.deactivate) {
-        void connector.deactivate()
-        createLog({
-          status: 'success',
-          method: 'disconnect',
-          message: 'wallet disconnected'
-        })
-      } else {
-        void connector.resetState()
-      }
-    }
-    else if (!isActivating) {
-        createLog({
-          status: 'info',
-          method: 'connect',
-          message: 'connecting...'
-        })
-        Promise.resolve(connector.activate(1))
-        .catch((e) => {
-          connector.resetState()
-        createLog({
-          status: 'error',
-          method: 'connect',
-          message: e.message
-        })
-        }) 
-      }
-  }
-
-  const connectedMethods = [
-    {
-      name: 'Deactivate',
-      onClick: handleToggleConnect,
-    },
-    {
-      name: 'Sign Message',
-      onClick: handleSignMessage,
-    },
-    {
-      name: 'Send Transaction (Burn 1 wei on Goerli)',
-      onClick: handleTransaction,
-    },
-  ];
-  const unConnectedMethods = [
-    {
-      name: 'Connect To Phantom',
-      onClick: handleToggleConnect,
-    },
-  ];
+const App = React.memo((logs: logProps) => {
+  const { connector, hooks } = useWeb3React();
 
   return (
     <StyledApp>
-      <Sidebar unConnectedMethods={unConnectedMethods} connectedMethods={connectedMethods} />
-      <Logs logs={logs} clearLogs={clearLogs} />
+      <Sidebar logProps={logs} connector={connector} hooks={hooks} />
+      <Logs logProps={logs} connector={connector} hooks={hooks} />
     </StyledApp>
   );
 });
 
 // =============================================================================
-// Main Component
+// Wrapper Component
 // =============================================================================
 
-const App = () => {
-  const props = useProps();
-  
+const Wrapper = () => {
+  const logs = useLogs();
+
   return (
     <Web3ReactProvider connectors={connections}>
-      <StatelessApp {...props} />;
+      <App {...logs} />
     </Web3ReactProvider>
   );
 };
 
-export default App;
+export default Wrapper;

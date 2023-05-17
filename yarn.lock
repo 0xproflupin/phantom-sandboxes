@@ -3723,7 +3723,7 @@
     "@web3-react/types" "^8.2.0"
     zustand "^4.3.5"
 
-"@web3-react/types/latest@npm:@web3-react/types@8", "@web3-react/types@^8.1.2-beta.0", "@web3-react/types@^8.2.0":
+"@web3-react/types/latest@npm:@web3-react/types@8", "@web3-react/types@^8.2.0":
   version "8.2.0"
   resolved "https://registry.yarnpkg.com/@web3-react/types/-/types-8.2.0.tgz#195464ebb94cb417e6dc3c16951573f9b6b3832a"
   integrity sha512-TBYTFlqJZaEpVbuAAKRJFX5PZc3lI1TqDZzY94zwCrCh4GBepwwK7+PxmRAppMFuNa5x0vFX/ghLEC44e6TCFg==
@@ -11466,11 +11466,11 @@ web-vitals@^2.1.0:
   integrity sha512-sVWcwhU5mX6crfI5Vd2dC4qchyTqxV8URinzt25XqVh+bHEPGH4C3NPrNionCP7Obx59wrYEbNlw4Z8sjALzZg==
 
 web3-react-phantom@^1.0.3:
-  version "1.0.3"
-  resolved "https://registry.yarnpkg.com/web3-react-phantom/-/web3-react-phantom-1.0.3.tgz#47254ce74d4e78223923c1d843b3ba79587c6f30"
-  integrity sha512-yGL6EtSCMrRpgXnSvLYWeUEUzdD9NmDNRD7fHK/eZZROvuJybf4qTMFnEEcOGOd7D6IZdBTjMSSzEvGEOGxHyw==
+  version "1.0.4"
+  resolved "https://registry.yarnpkg.com/web3-react-phantom/-/web3-react-phantom-1.0.4.tgz#e3e58f1015bd4d600d922fac29206e44cf867a35"
+  integrity sha512-HKgmpJuHCQpPPUpNpe+/JSJNEMpUYce/TfcN2eERUj3fYZwRkHWOk1Uuw1sYJZKZYV6znME2iOmvGxyHl1oOpA==
   dependencies:
-    "@web3-react/types" "^8.1.2-beta.0"
+    "@web3-react/types" "^8.2.0"
 
 web3-react-v6-phantom@^1.0.5:
   version "1.0.5"

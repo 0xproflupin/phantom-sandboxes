@@ -1,14 +1,18 @@
-import React from 'react';
+import React, {  } from 'react';
 import styled from 'styled-components';
 import { NavLink } from 'react-router-dom';
+import { Buffer } from 'buffer';
 
 import { GRAY, REACT_GRAY, PURPLE, WHITE, DARK_GRAY } from '../../constants';
 
 import { hexToRGB } from '../../utils';
 
 import Button from '../Button';
-import { SidebarMethods } from '../../App';
-import { useWeb3React } from '@web3-react/core';
+import { Web3ReactSelectedHooks } from '@web3-react/core/latest';
+import { Connector } from '@web3-react/types/latest';
+import { logProps } from '../../types';
+import { Web3Provider } from '@ethersproject/providers';
+import { parseEther, toHex } from 'viem';
 
 // =============================================================================
 // Styled Components
@@ -181,85 +185,180 @@ const MenuContainer = styled.div`
 const Menu = styled.div``;
 
 // =============================================================================
-// Typedefs
+// Constants
 // =============================================================================
 
-interface Props {
-  connectedMethods: SidebarMethods[];
-  unConnectedMethods: SidebarMethods[];
-}
+const message = 'To avoid digital dognappers, sign below to authenticate with CryptoCorgis.';
+const msg = `0x${Buffer.from(message, 'utf8').toString('hex')}`;
 
 // =============================================================================
 // Main Component
 // =============================================================================
 
-const Sidebar = React.memo((props: Props) => {
-  const { connectedMethods, unConnectedMethods } = props;
-  const { account, active, chainId } = useWeb3React();
-  const [menuOpen, setMenuOpen] = React.useState(false);
+const Sidebar = React.memo(
+  ({ connector, hooks, logProps }: { connector: Connector; hooks: Web3ReactSelectedHooks; logProps: logProps }) => {
+    const { useSelectedAccount, useSelectedIsActive, useSelectedIsActivating } = hooks;
+    const isActivating = useSelectedIsActivating(connector);
+    const isActive = useSelectedIsActive(connector);
+    const account = useSelectedAccount(connector);
+    const [menuOpen, setMenuOpen] = React.useState(false);
+    const { createLog } = logProps;
 
-  const toggleMenu = () => {
-    setMenuOpen(!menuOpen);
-  };
+    const toggleMenu = () => {
+      setMenuOpen(!menuOpen);
+    };
+    const signMessage = async () => {
+      const sig = await connector?.provider.request({
+        method: 'personal_sign',
+        params: [msg, account, message],
+      });
+      createLog({
+        status: 'success',
+        method: 'signMessage',
+        message: `Successfully signed Message: ${sig}`,
+      });
+    };
+    const sendTransaction = async () => {
+     const provider = new Web3Provider(window?.phantom?.ethereum) 
+      try {
+        const signer = provider.getSigner();
+        const tx = {
+          gasLimit: toHex(100000),
+          to: '0x0000000000000000000000000000000000000000',
+          value: parseEther('0.000000000000000001'), // 1 wei
+        };
+        const pendingHash = await signer.sendTransaction(tx);
+        createLog({
+          status: 'info',
+          method: 'eth_sendTransaction',
+          message: `sending TX: ${pendingHash.hash}`,
+        });
+        createLog({
+          status: 'info',
+          method: 'eth_sendTransaction',
+          message: `pending....this could take up to 30 seconds`,
+        });
+        const finalizedHash = await pendingHash.wait(1);
+        createLog({
+          status: 'success',
+          method: 'eth_sendTransaction',
+          message: `successfully burned 1 wei of ETH ${finalizedHash.blockHash}`,
+        });
+      } catch (error) {
+        createLog({
+          status: 'error',
+          method: 'eth_sendTransaction',
+          message: error.message
+        });
+      }
+    };
 
-  return (
-    <Main>
-      <Body>
-        <Menu>
-          <MenuButton onClick={toggleMenu}>Sandboxes</MenuButton>
-          {menuOpen && (
-            <MenuContainer>
-              <NavigationLink to="/sol-sandbox">Solana Sandbox</NavigationLink>
-              <NavigationLink to="/eth-sandbox">Ethereum Sandbox</NavigationLink>
-              <NavigationLink to="/multi-chain-sandbox">Multi-Chain Sandbox</NavigationLink>
-              <NavigationLink to="/sol-adapter-sandbox">Solana Adapter Sandbox</NavigationLink>
-              <NavigationLink to="/rainbowkit-sandbox">Rainbowkit Sandbox</NavigationLink>
-              <NavigationLink to="/wagmi-sandbox">Wagmi Sandbox</NavigationLink>
-              <NavigationLink to="/web3-react-v6-sandbox">Web3 React V6 Sandbox</NavigationLink>
-              <NavigationLink to="/web3-react-v8-sandbox">Web3 React V8 Sandbox</NavigationLink>
-              <NavigationLink to="/experimental-sandbox">Experimental Sandbox</NavigationLink>
-            </MenuContainer>
+    const connectedMethods = [
+      {
+        name: 'Sign message',
+        onClick: signMessage,
+      },
+      {
+        name: 'Send transaction (burn 1 wei on Goerli)',
+        onClick: sendTransaction,
+      },
+    ];
+    const handleToggleConnect = () => {
+      if (isActive) {
+        if (connector?.deactivate) {
+          void connector.deactivate();
+          createLog({
+            status: 'success',
+            method: 'disconnect',
+            message: 'wallet disconnected',
+          });
+        } else {
+          void connector.resetState();
+          createLog({
+            status: 'success',
+            method: 'disconnect',
+            message: 'wallet disconnected',
+          });
+        }
+      } else if (!isActivating) {
+        createLog({
+          status: 'info',
+          method: 'connect',
+          message: 'connecting...',
+        });
+        Promise.resolve(connector.activate(5)) // 5 is goerli chainID
+          .catch((e) => {
+            connector.resetState();
+            createLog({
+              status: 'error',
+              method: 'connect',
+              message: e.message,
+            });
+          });
+        createLog({
+          status: 'success',
+          method: 'connect',
+          message: `successfully connected to app!`,
+        });
+      }
+    };
+
+    return (
+      <Main>
+        <Body>
+          <Menu>
+            <MenuButton onClick={toggleMenu}>Sandboxes</MenuButton>
+            {menuOpen && (
+              <MenuContainer>
+                <NavigationLink to="/sol-sandbox">Solana Sandbox</NavigationLink>
+                <NavigationLink to="/eth-sandbox">Ethereum Sandbox</NavigationLink>
+                <NavigationLink to="/multi-chain-sandbox">Multi-Chain Sandbox</NavigationLink>
+                <NavigationLink to="/sol-adapter-sandbox">Solana Adapter Sandbox</NavigationLink>
+                <NavigationLink to="/rainbowkit-sandbox">Rainbowkit Sandbox</NavigationLink>
+                <NavigationLink to="/wagmi-sandbox">Wagmi Sandbox</NavigationLink>
+                <NavigationLink to="/web3-react-v6-sandbox">Web3 React V6 Sandbox</NavigationLink>
+                <NavigationLink to="/web3-react-v8-sandbox">Web3 React V8 Sandbox</NavigationLink>
+                <NavigationLink to="/experimental-sandbox">Experimental Sandbox</NavigationLink>
+              </MenuContainer>
+            )}
+          </Menu>
+          <Link>
+            <img src="https://phantom.app/img/phantom-logo.svg" alt="Phantom" width="200" />
+            <Subtitle>Web3-React-V6 Sandbox</Subtitle>
+          </Link>
+          {isActive ? (
+            // connected
+            <>
+              <div>
+                <Pre>Connected as</Pre>
+                <Badge>{account}</Badge>
+                <Divider />
+              </div>
+              <Button onClick={handleToggleConnect}>{isActive ? 'Disconnect' : 'Connect'}</Button>
+              {connectedMethods.map((method, i) => (
+                <Button key={`${method.name}-${i}`} onClick={method.onClick}>
+                  {method.name}
+                </Button>
+              ))}
+            </>
+          ) : (
+            // not connected
+            <>
+              <Button onClick={handleToggleConnect}>{isActive ? 'Disconnect' : 'Connect'}</Button>
+            </>
           )}
-        </Menu>
-        <Link>
-          <img src="https://phantom.app/img/phantom-logo.svg" alt="Phantom" width="200" />
-          <Subtitle>Web3-React-V6 Sandbox</Subtitle>
-        </Link>
-        {active && chainId === 0x5 ? (
-          // connected
-          <>
-            <div>
-              <Pre>Connected as</Pre>
-              <Badge>{account}</Badge>
-              <Divider />
-            </div>
-            {connectedMethods.map((method, i) => (
-              <Button key={`${method.name}-${i}`} onClick={method.onClick}>
-                {method.name}
-              </Button>
-            ))}
-          </>
-        ) : (
-          // not connected
-          <>
-            {unConnectedMethods.map((method, i) => (
-              <Button key={`${method.name}-${i}`} onClick={method.onClick}>
-                {method.name}
-              </Button>
-            ))}
-          </>
-        )}
-      </Body>
-      {/* 😊 💕  */}
-      <Tag>
-        Made with{' '}
-        <span role="img" aria-label="Red Heart Emoji">
-          ❤️
-        </span>{' '}
-        by the <a href="https://phantom.app">Phantom</a> team
-      </Tag>
-    </Main>
-  );
-});
+        </Body>
+        {/* 😊 💕  */}
+        <Tag>
+          Made with{' '}
+          <span role="img" aria-label="Red Heart Emoji">
+            ❤️
+          </span>{' '}
+          by the <a href="https://phantom.app">Phantom</a> team
+        </Tag>
+      </Main>
+    );
+  }
+);
 
 export default Sidebar;

@@ -1,7 +1,9 @@
 import React from 'react';
 import styled from 'styled-components';
+import { Web3ReactSelectedHooks } from '@web3-react/core/latest';
+import { Connector } from '@web3-react/types/latest'
 
-import { TLog } from '../../types';
+import { logProps } from '../../types';
 
 import { BLACK, GRAY } from '../../constants';
 
@@ -40,22 +42,14 @@ const Row = styled.div`
     margin-right: 10px;
   }
 `;
-
-// =============================================================================
-// Typedefs
-// =============================================================================
-
-interface Props {
-  logs: TLog[];
-  clearLogs: () => void;
-}
-
 // =============================================================================
 // Main Component
 // =============================================================================
 
-const Logs = React.memo((props: Props) => {
-  const { logs, clearLogs } = props;
+const Logs = React.memo(({connector, hooks, logProps}: {connector: Connector, hooks: Web3ReactSelectedHooks, logProps: logProps}) => {
+  const {logs, clearLogs } = logProps
+  const { useSelectedIsActive } = hooks
+  const isActive = useSelectedIsActive(connector)
 
   return (
     <StyledSection>
@@ -70,7 +64,7 @@ const Logs = React.memo((props: Props) => {
         <Row>
           <span>{'>'}</span>
           <PlaceholderMessage>
-            {/* {address ? (
+            {isActive ? (
               // connected
               <>
                 Click a button and watch magic happen...{' '}
@@ -86,7 +80,7 @@ const Logs = React.memo((props: Props) => {
                   👻
                 </span>
               </>
-            )} */}
+            )}
           </PlaceholderMessage>
         </Row>
       )}
