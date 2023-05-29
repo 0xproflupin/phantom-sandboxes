@@ -357,7 +357,7 @@ const StatelessApp = () => {
 const App = () => {
   const network = WalletAdapterNetwork.Mainnet;
 
-  const endpoint = "https://rpc.helius.xyz/?api-key=402f3e20-991a-4e36-9e2b-5f3d375aaec0";
+  const endpoint = `https://rpc.helius.xyz/?api-key=${process.env.HELIUS_RPC_API_KEY}`;
 
   const wallets = useMemo(
     () => [], // confirmed also with `() => []` for wallet-standard only

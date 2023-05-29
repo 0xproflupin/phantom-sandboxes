@@ -43,7 +43,7 @@ const StyledApp = styled.div`
 // =============================================================================
 
 // NB: This URL will only work for Phantom sandbox apps! Please do not use this for your project.
-const NETWORK = 'https://rpc.helius.xyz/?api-key=402f3e20-991a-4e36-9e2b-5f3d375aaec0';
+const NETWORK = `https://rpc.helius.xyz/?api-key=${process.env.HELIUS_RPC_API_KEY}`;
 const connection = new Connection(NETWORK);
 const message = 'To avoid digital dognappers, sign below to authenticate with CryptoCorgis.';
 const sleep = (timeInMS) => new Promise((resolve) => setTimeout(resolve, timeInMS));
