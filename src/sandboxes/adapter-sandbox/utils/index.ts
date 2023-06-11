@@ -1,4 +1,5 @@
 export { default as createAddressLookupTable } from './createAddressLookupTable';
+// export { createSignInData, createSignInErrorData } from './createSignInData';
 export { default as createTransferTransaction } from './createTransferTransaction';
 export { default as createTransferTransactionV0 } from './createTransferTransactionV0';
 export { default as extendAddressLookupTable } from './extendAddressLookupTable';
@@ -8,4 +9,5 @@ export { default as signAllTransactions } from './signAllTransactions';
 export { default as signAndSendTransaction } from './signAndSendTransaction';
 export { default as signAndSendTransactionV0WithLookupTable } from './signAndSendTransactionV0WithLookupTable';
 export { default as signMessage } from './signMessage';
+// export { default as signIn } from './signIn';
 export { default as signTransaction } from './signTransaction';

@@ -1,4 +1,5 @@
 import { PublicKey, Transaction, VersionedTransaction, SendOptions } from '@solana/web3.js';
+// import { SolanaSignInInput } from "@solana/wallet-standard-features";
 
 type DisplayEncoding = 'utf8' | 'hex';
 
@@ -30,6 +31,9 @@ export interface Provider {
     transactions: (Transaction | VersionedTransaction)[]
   ) => Promise<(Transaction | VersionedTransaction)[]>;
   signMessage: (message: Uint8Array | string, display?: DisplayEncoding) => Promise<any>;
+  // signIn: (signInData: SolanaSignInInput) => Promise<{
+  //   address: PublicKey, signedMessage: Uint8Array, signature: Buffer
+  // }>;
   connect: (opts?: Partial<ConnectOpts>) => Promise<{ publicKey: PublicKey }>;
   disconnect: () => Promise<void>;
   on: (event: PhantomEvent, handler: (args: any) => void) => void;

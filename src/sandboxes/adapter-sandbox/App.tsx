@@ -11,6 +11,7 @@ import { WalletModalProvider } from "@solana/wallet-adapter-react-ui";
 
 import {
   createAddressLookupTable,
+  // createSignInData,
   createTransferTransaction,
   createTransferTransactionV0,
   extendAddressLookupTable,
@@ -19,6 +20,7 @@ import {
   signAndSendTransaction,
   signAndSendTransactionV0WithLookupTable,
   signMessage,
+  // signIn,
   signTransaction,
 } from './utils';
 
@@ -266,6 +268,50 @@ const StatelessApp = () => {
       });
     }
   }, [createLog, publicKey, signMsg, wallet]);
+
+  // Coming soon!
+  // /** SignIn */
+  // const handleSignIn = useCallback(async () => {
+  //   if (!publicKey || !wallet) return;
+  //   const signInData = await createSignInData();
+
+  //   try {
+  //     const {account, signedMessage, signature} = await signIn(provider, signInData);
+  //     const message = new TextDecoder().decode(signedMessage);
+  //     createLog({
+  //       status: 'success',
+  //       method: 'signIn',
+  //       message: `Message signed: ${message} by ${address} with signature ${signature}`,
+  //     });
+  //   } catch (error) {
+  //     createLog({
+  //       status: 'error',
+  //       method: 'signIn',
+  //       message: error.message,
+  //     });
+  //   }
+  // }, [createLog, provider]);
+
+  // /** SignInError */
+  // const handleSignInError = useCallback(async () => {
+  //   if (!provider) return;
+  //   const signInData = await createSignInErrorData(provider.publicKey.toString());
+
+  //   try {
+  //     const {address, signedMessage, signature} = await signIn(provider, signInData);
+  //     createLog({
+  //       status: 'success',
+  //       method: 'signMessage',
+  //       message: `Message signed: ${JSON.stringify(signedMessage)} by ${address} with signature ${signature}`,
+  //     });
+  //   } catch (error) {
+  //     createLog({
+  //       status: 'error',
+  //       method: 'signIn',
+  //       message: error.message,
+  //     });
+  //   }
+  // }, [createLog, provider]);
 
   /** Connect */
   const handleConnect = useCallback(async () => {
