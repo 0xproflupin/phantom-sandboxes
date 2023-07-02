@@ -65,11 +65,6 @@ const Link = styled.a.attrs({
   }
 `;
 
-const Subtitle = styled.h5`
-  color: ${GRAY};
-  font-weight: 400;
-`;
-
 const Pre = styled.pre`
   margin-bottom: 5px;
 `;
@@ -323,8 +318,7 @@ const Sidebar = React.memo(
             )}
           </Menu>
           <Link>
-            <img src="https://phantom.app/img/phantom-logo.svg" alt="Phantom" width="200" />
-            <Subtitle>Web3-React-V6 Sandbox</Subtitle>
+            <img src="/images/phantom-icon-purple.png" alt="Phantom" width="75" />
           </Link>
           {isActive ? (
             // connected

@@ -20,14 +20,14 @@ interface ConnectOpts {
 }
 
 export interface SignInData {
-  domain: string,
+  domain?: string,
   address?: string,
   statement?: string,
-  uri: string,
+  uri?: string,
   version?: string,
-  chain: string,
-  nonce: string,
-  issuedAt: string,
+  chainId?: string,
+  nonce?: string,
+  issuedAt?: string,
   expirationTime?: string,
   notBefore?: string,
   requestId?: string,
