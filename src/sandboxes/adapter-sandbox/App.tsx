@@ -8,6 +8,9 @@ import styled from 'styled-components';
 import { useWallet, useConnection, WalletProvider, ConnectionProvider } from '@solana/wallet-adapter-react';
 import { WalletAdapterNetwork } from '@solana/wallet-adapter-base';
 import { WalletModalProvider } from "@solana/wallet-adapter-react-ui";
+import type { Adapter } from '@solana/wallet-adapter-base';
+import { type SolanaSignInInput } from '@solana/wallet-standard-features';
+import { verifySignIn } from '@solana/wallet-standard-util';
 
 import {
   createAddressLookupTable,
@@ -26,7 +29,7 @@ import {
 
 import { TLog } from './types';
 
-import { Logs, Sidebar, AutoConnectProvider } from './components';
+import { Logs, Sidebar, AutoConnectProvider, useAutoConnect } from './components';
 
 // =============================================================================
 // Styled Components
@@ -411,10 +414,23 @@ const App = () => {
     [network]
   );
 
+  const { autoConnect } = useAutoConnect();
+
+  const autoSignIn = useCallback(async (adapter: Adapter) => {
+    if (!('signIn' in adapter)) return true;
+
+    const input: SolanaSignInInput = {};
+    const output = await adapter.signIn(input);
+
+    if (!verifySignIn(input, output)) throw new Error('Sign In verification failed!');
+
+    return false;
+}, []);
+
   return (
     <AutoConnectProvider>
       <ConnectionProvider endpoint={endpoint}>
-        <WalletProvider wallets={wallets} autoConnect>
+        <WalletProvider wallets={wallets} autoConnect={autoConnect && autoSignIn}>
           <WalletModalProvider>
             <StatelessApp />
           </WalletModalProvider>

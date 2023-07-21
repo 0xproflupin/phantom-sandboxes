@@ -9,11 +9,11 @@ interface AutoConnectContextState {
 
 const AutoConnectContext = createContext<AutoConnectContextState>({} as AutoConnectContextState);
 
-function useAutoConnect(): AutoConnectContextState {
+export function useAutoConnect(): AutoConnectContextState {
     return useContext(AutoConnectContext);
 }
 
-const AutoConnectProvider: FC<{ children: ReactNode }> = ({ children }) => {
+export const AutoConnectProvider: FC<{ children: ReactNode }> = ({ children }) => {
     const [autoConnect, setAutoConnect] = useLocalStorage('autoConnect', true);
 
     return (
@@ -21,4 +21,3 @@ const AutoConnectProvider: FC<{ children: ReactNode }> = ({ children }) => {
     );
 };
 
-export default AutoConnectProvider;
