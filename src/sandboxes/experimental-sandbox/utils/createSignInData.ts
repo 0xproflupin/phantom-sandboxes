@@ -32,12 +32,11 @@ export const createSignInErrorData = async (address: string): Promise<SignInData
   const currentDateTime = now.toISOString();
   const signInData: SignInData = {
     domain: "phishing.com",
-    address: "AvQTW8uhcLRd3Q6vvu5taRA66JfMsbQFasVLETAWwsdt",
     statement: "Sign-in to connect!",
     uri: "https://www.phishing.com",
     version: "1",
     nonce: "oBbLoEldZs",
-    chainId: "solana:mainnet",
+    chainId: "solana:devnet",
     issuedAt: currentDateTime,
     resources: ["https://example.com", "https://phantom.app/"]
   };
