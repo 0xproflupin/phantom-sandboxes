@@ -14,7 +14,7 @@ export const createSignInData = async (): Promise<SolanaSignInInput> => {
     uri,
     version: "1",
     nonce: "oBbLoEldZs",
-    chain: "solana:mainnet",
+    chainId: "solana:mainnet",
     issuedAt: currentDateTime,
     resources: ["https://example.com", "https://phantom.app/"]
   };
@@ -33,7 +33,7 @@ export const createSignInErrorData = async (): Promise<SolanaSignInInput> => {
     uri: "https://www.phishing.com",
     version: "1",
     nonce: "oBbLoEldZs",
-    chain: "solana:mainnet",
+    chainId: "solana:mainnet",
     issuedAt: currentDateTime,
     resources: ["https://example.com", "https://phantom.app/"]
   };
