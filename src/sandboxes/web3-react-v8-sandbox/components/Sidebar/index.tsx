@@ -302,10 +302,10 @@ const Sidebar = React.memo(
       <Main>
         <Body>
           <Menu>
-            <MenuButton onClick={toggleMenu}>Sandboxes</MenuButton>
+            <MenuButton onClick={toggleMenu}>Sandboxes ▼</MenuButton>
             {menuOpen && (
               <MenuContainer>
-                <NavigationLink to="/sol-sandbox">Solana Sandbox</NavigationLink>
+                <NavigationLink to="/sol-devnet-sandbox">Solana Devnet Sandbox</NavigationLink>
                 <NavigationLink to="/eth-sandbox">Ethereum Sandbox</NavigationLink>
                 <NavigationLink to="/multi-chain-sandbox">Multi-Chain Sandbox</NavigationLink>
                 <NavigationLink to="/sol-adapter-sandbox">Solana Adapter Sandbox</NavigationLink>

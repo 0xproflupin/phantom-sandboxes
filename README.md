@@ -2,7 +2,7 @@
 
 The all-in-one Phantom Mult-Chain Sandbox Monorepo. This react app contains the following sandboxes:
 
-1. [**Solana**](src/sandboxes/sol-sandbox)
+1. [**Solana**](src/sandboxes/sol-devnet-sandbox)
 2. [**Ethereum**](src/sandboxes/eth-sandbox)
 3. [**Multi-Chain**](src/sandboxes/multi-chain-sandbox)
 4. [**Solana Wallet Adapter**](src/sandboxes/adapter-sandbox)
@@ -48,12 +48,12 @@ You will also see any lint errors in the console.
 ## Bootstrap Standalone Sandboxes
 Run the [script](scripts/create-react-app-from-sandbox.sh) to create a react app for any of the available sandboxes with only those dependancies that are required for that sandbox:
 
-For example, to create a react app for the `sol-sandbox` in `/src/sandboxes/
+For example, to create a react app for the `sol-devnet-sandbox` in `/src/sandboxes/
 ```
-yarn create-app sol-sandbox
+yarn create-app sol-devnet-sandbox
 ```
 
-This will create a folder `src/sandbox_react_apps/sol-sandbox_react_app` which will be a standalone react app for the Solana sandbox. Also, all the dependancies of this sandbox will be already installed using the above script.
+This will create a folder `src/sandbox_react_apps/sol-devnet-sandbox_react_app` which will be a standalone react app for the Solana sandbox. Also, all the dependancies of this sandbox will be already installed using the above script.
 
 ### Running Standalone Sandboxes
 To run the newly created standalone sandbox, run:
