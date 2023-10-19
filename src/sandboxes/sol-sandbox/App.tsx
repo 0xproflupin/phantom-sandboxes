@@ -43,8 +43,9 @@ const StyledApp = styled.div`
 // =============================================================================
 
 // NB: This URL will only work for Phantom sandbox apps! Please do not use this for your project.
-const NETWORK = `https://rpc-devnet.helius.xyz/?api-key=${process.env.REACT_APP_HELIUS_API}`;
-const connection = new Connection(NETWORK);
+const DEVNET = `https://rpc-devnet.helius.xyz/?api-key=${process.env.REACT_APP_HELIUS_API}`;
+const MAINNET = `https://rpc.helius.xyz/?api-key=${process.env.REACT_APP_HELIUS_API}`;
+const connection = new Connection(DEVNET);
 const message = 'To avoid digital dognappers, sign below to authenticate with CryptoCorgis.';
 const sleep = (timeInMS) => new Promise((resolve) => setTimeout(resolve, timeInMS));
 
@@ -54,13 +55,13 @@ const sleep = (timeInMS) => new Promise((resolve) => setTimeout(resolve, timeInM
 
 export type ConnectedMethods =
   | {
-    name: string;
-    onClick: () => Promise<string>;
-  }
+      name: string;
+      onClick: () => Promise<string>;
+    }
   | {
-    name: string;
-    onClick: () => Promise<void>;
-  };
+      name: string;
+      onClick: () => Promise<void>;
+    };
 
 interface Props {
   publicKey: PublicKey | null;
@@ -80,7 +81,7 @@ interface Props {
  */
 const useProps = (): Props => {
   const [provider, setProvider] = useState<PhantomProvider | null>(null);
-  const [logs, setLogs] = useState<TLog[]>([]); 
+  const [logs, setLogs] = useState<TLog[]>([]);
 
   const createLog = useCallback(
     (log: TLog) => {
@@ -100,7 +101,7 @@ const useProps = (): Props => {
       setProvider(getProvider());
     })();
   }, []);
-  
+
   useEffect(() => {
     if (!provider) return;
 
