@@ -42,17 +42,24 @@ const StyledApp = styled.div`
 // Constants
 // =============================================================================
 
-// NB: This URL will only work for Phantom sandbox apps! Please do not use this for your project.
-const DEVNET = `https://rpc-devnet.helius.xyz/?api-key=${process.env.REACT_APP_HELIUS_API}`;
-const MAINNET = `https://rpc.helius.xyz/?api-key=${process.env.REACT_APP_HELIUS_API}`;
-const connection = new Connection(DEVNET);
 const message = 'To avoid digital dognappers, sign below to authenticate with CryptoCorgis.';
 const sleep = (timeInMS) => new Promise((resolve) => setTimeout(resolve, timeInMS));
+
+const getConnectionUrl = (network: string): string => {
+  switch (network) {
+    case 'devnet':
+      // NB: This URL will only work for Phantom sandbox apps! Please do not use this for your project.
+      return `https://rpc-devnet.helius.xyz/?api-key=${process.env.REACT_APP_HELIUS_API}`;
+    case 'mainnet':
+      return `https://rpc.helius.xyz/?api-key=${process.env.REACT_APP_HELIUS_API}`;
+    default:
+      throw new Error(`Invalid network: ${network}`);
+  }
+};
 
 // =============================================================================
 // Typedefs
 // =============================================================================
-
 export type ConnectedMethods =
   | {
       name: string;
@@ -69,6 +76,8 @@ interface Props {
   handleConnect: () => Promise<void>;
   logs: TLog[];
   clearLogs: () => void;
+  handleNetworkSwitch: (newNetwork: string) => Promise<void>;
+  network: string;
 }
 
 // =============================================================================
@@ -81,6 +90,9 @@ interface Props {
  */
 const useProps = (): Props => {
   const [provider, setProvider] = useState<PhantomProvider | null>(null);
+  // TODO: create prop for network pass through to sidebar
+  const [network, setNetwork] = useState('devnet');
+  const [connection, setConnection] = useState(new Connection(getConnectionUrl(network)));
   const [logs, setLogs] = useState<TLog[]>([]);
 
   const createLog = useCallback(
@@ -195,7 +207,7 @@ const useProps = (): Props => {
         message: error.message,
       });
     }
-  }, [createLog, provider]);
+  }, [createLog, provider, connection]);
 
   /** SignAndSendTransactionV0 */
   const handleSignAndSendTransactionV0 = useCallback(async () => {
@@ -222,7 +234,7 @@ const useProps = (): Props => {
         message: error.message,
       });
     }
-  }, [createLog, provider]);
+  }, [createLog, provider, connection]);
 
   /** SignAndSendTransactionV0WithLookupTable */
   const handleSignAndSendTransactionV0WithLookupTable = useCallback(async () => {
@@ -273,7 +285,7 @@ const useProps = (): Props => {
         message: error.message,
       });
     }
-  }, [createLog, provider]);
+  }, [createLog, provider, connection]);
 
   /** SignTransaction */
   const handleSignTransaction = useCallback(async () => {
@@ -299,7 +311,7 @@ const useProps = (): Props => {
         message: error.message,
       });
     }
-  }, [createLog, provider]);
+  }, [createLog, provider, connection]);
 
   /** SignAllTransactions */
   const handleSignAllTransactions = useCallback(async () => {
@@ -328,7 +340,7 @@ const useProps = (): Props => {
         message: error.message,
       });
     }
-  }, [createLog, provider]);
+  }, [createLog, provider, connection]);
 
   /** SignMessage */
   const handleSignMessage = useCallback(async () => {
@@ -381,6 +393,27 @@ const useProps = (): Props => {
     }
   }, [createLog, provider]);
 
+  const handleNetworkSwitch = useCallback(
+    async (newNetwork: string) => {
+      try {
+        const newConnection = new Connection(getConnectionUrl(newNetwork), 'confirmed');
+        setConnection(newConnection);
+        setNetwork(newNetwork);
+        createLog({
+          status: 'success',
+          message: `Switched to ${newNetwork} network`,
+        });
+      } catch (error) {
+        console.log('catch error');
+        createLog({
+          status: 'error',
+          message: error.message,
+        });
+      }
+    },
+    [createLog, setConnection, setNetwork]
+  );
+
   const connectedMethods = useMemo(() => {
     return [
       {
@@ -428,6 +461,8 @@ const useProps = (): Props => {
     handleConnect,
     logs,
     clearLogs,
+    handleNetworkSwitch,
+    network,
   };
 };
 
@@ -436,11 +471,17 @@ const useProps = (): Props => {
 // =============================================================================
 
 const StatelessApp = React.memo((props: Props) => {
-  const { publicKey, connectedMethods, handleConnect, logs, clearLogs } = props;
+  const { publicKey, connectedMethods, handleConnect, logs, clearLogs, handleNetworkSwitch, network } = props;
 
   return (
     <StyledApp>
-      <Sidebar publicKey={publicKey} connectedMethods={connectedMethods} connect={handleConnect} />
+      <Sidebar
+        publicKey={publicKey}
+        connectedMethods={connectedMethods}
+        connect={handleConnect}
+        handleNetworkSwitch={handleNetworkSwitch}
+        network={network}
+      />
       <Logs publicKey={publicKey} logs={logs} clearLogs={clearLogs} />
     </StyledApp>
   );

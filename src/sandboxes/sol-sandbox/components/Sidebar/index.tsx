@@ -10,9 +10,6 @@ import { hexToRGB } from '../../utils';
 import Button from '../Button';
 import { ConnectedMethods } from '../../App';
 
-// onClick change color of selected button
-// TODO: switch rpc connnection devnet mainnet
-
 // =============================================================================
 // Styled Components
 // =============================================================================
@@ -214,6 +211,8 @@ interface Props {
   publicKey?: PublicKey;
   connectedMethods: ConnectedMethods[];
   connect: () => Promise<void>;
+  handleNetworkSwitch: (network: string) => void;
+  network: string;
 }
 
 // =============================================================================
@@ -221,17 +220,11 @@ interface Props {
 // =============================================================================
 
 const Sidebar = React.memo((props: Props) => {
-  const { publicKey, connectedMethods, connect } = props;
+  const { publicKey, connectedMethods, connect, handleNetworkSwitch, network } = props;
   const [sandboxMenuOpen, setSandboxMenuOpen] = React.useState(false);
-  const [networkMenuOpen, setNetworkMenuOpen] = React.useState(false);
-  const [network, setNetwork] = React.useState('mainnet');
 
   const toggleSandboxMenu = () => {
     setSandboxMenuOpen(!sandboxMenuOpen);
-  };
-
-  const toggleNetworkMenu = () => {
-    setNetworkMenuOpen(!networkMenuOpen);
   };
 
   return (
@@ -256,15 +249,20 @@ const Sidebar = React.memo((props: Props) => {
           )}
         </Menu>
         <Menu>
-          <MenuButton onClick={toggleNetworkMenu}>Networks</MenuButton>
-          {networkMenuOpen && (
-            <MenuContainer>
-              <NetworkSelectButton onClick={() => setNetwork('mainnet')}>Mainnet</NetworkSelectButton>
-              <NetworkSelectButton onClick={() => setNetwork('devnet')} className="selected">
-                Devnet
-              </NetworkSelectButton>
-            </MenuContainer>
-          )}
+          <MenuContainer>
+            <NetworkSelectButton
+              onClick={() => handleNetworkSwitch('devnet')}
+              className={network == 'devnet' ? 'selected' : ''}
+            >
+              Devnet
+            </NetworkSelectButton>
+            <NetworkSelectButton
+              onClick={() => handleNetworkSwitch('mainnet')}
+              className={network == 'mainnet' ? 'selected' : ''}
+            >
+              Mainnet
+            </NetworkSelectButton>
+          </MenuContainer>
         </Menu>
         <Link>
           <img src="/images/phantom-icon-purple.png" alt="Phantom" width="75" />
