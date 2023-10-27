@@ -231,7 +231,7 @@ const Sidebar = React.memo((props: Props) => {
     <Main>
       <Body>
         <Menu>
-          <MenuButton onClick={toggleSandboxMenu}>Sandboxes</MenuButton>
+          <MenuButton onClick={toggleSandboxMenu}>Sandboxes {sandboxMenuOpen ? '-' : '+'}</MenuButton>
           {sandboxMenuOpen && (
             <MenuContainer>
               <NavigationLink to="/sol-sandbox" className="selected">
