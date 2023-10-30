@@ -231,12 +231,10 @@ const Sidebar = React.memo((props: Props) => {
     <Main>
       <Body>
         <Menu>
-          <MenuButton onClick={toggleSandboxMenu}>Sandboxes {sandboxMenuOpen ? '-' : '+'}</MenuButton>
+          <MenuButton onClick={toggleSandboxMenu}>Solana Sandbox {sandboxMenuOpen ? '-' : '\u2630'}</MenuButton>
           {sandboxMenuOpen && (
             <MenuContainer>
-              <NavigationLink to="/sol-sandbox" className="selected">
-                Solana Sandbox
-              </NavigationLink>
+              <NavigationLink to="/sol-sandbox">Solana Sandbox</NavigationLink>
               <NavigationLink to="/eth-sandbox">Ethereum Sandbox</NavigationLink>
               <NavigationLink to="/multi-chain-sandbox">Multi-Chain Sandbox</NavigationLink>
               <NavigationLink to="/sol-adapter-sandbox">Solana Adapter Sandbox</NavigationLink>

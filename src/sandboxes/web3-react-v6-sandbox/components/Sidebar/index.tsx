@@ -191,18 +191,18 @@ interface Props {
 const Sidebar = React.memo((props: Props) => {
   const { connectedMethods, unConnectedMethods } = props;
   const { account, active, chainId } = useWeb3React();
-  const [menuOpen, setMenuOpen] = React.useState(false);
+  const [sandboxMenuOpen, setSandboxMenuOpen] = React.useState(false);
 
-  const toggleMenu = () => {
-    setMenuOpen(!menuOpen);
+  const toggleSandboxMenu = () => {
+    setSandboxMenuOpen(!sandboxMenuOpen);
   };
 
   return (
     <Main>
       <Body>
         <Menu>
-          <MenuButton onClick={toggleMenu}>Sandboxes</MenuButton>
-          {menuOpen && (
+          <MenuButton onClick={toggleSandboxMenu}>Web3 React V6 Sandbox {sandboxMenuOpen ? '-' : '\u2630'}</MenuButton>
+          {sandboxMenuOpen && (
             <MenuContainer>
               <NavigationLink to="/sol-sandbox">Solana Sandbox</NavigationLink>
               <NavigationLink to="/eth-sandbox">Ethereum Sandbox</NavigationLink>

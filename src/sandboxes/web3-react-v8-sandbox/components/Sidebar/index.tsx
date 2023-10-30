@@ -1,4 +1,4 @@
-import React, {  } from 'react';
+import React from 'react';
 import styled from 'styled-components';
 import { NavLink } from 'react-router-dom';
 import { Buffer } from 'buffer';
@@ -196,11 +196,11 @@ const Sidebar = React.memo(
     const isActivating = useSelectedIsActivating(connector);
     const isActive = useSelectedIsActive(connector);
     const account = useSelectedAccount(connector);
-    const [menuOpen, setMenuOpen] = React.useState(false);
+    const [sandboxMenuOpen, setSandboxMenuOpen] = React.useState(false);
     const { createLog } = logProps;
 
-    const toggleMenu = () => {
-      setMenuOpen(!menuOpen);
+    const toggleSandboxMenu = () => {
+      setSandboxMenuOpen(!sandboxMenuOpen);
     };
     const signMessage = async () => {
       const sig = await connector?.provider.request({
@@ -214,7 +214,7 @@ const Sidebar = React.memo(
       });
     };
     const sendTransaction = async () => {
-     const provider = new Web3Provider(window?.phantom?.ethereum) 
+      const provider = new Web3Provider(window?.phantom?.ethereum);
       try {
         const signer = provider.getSigner();
         const tx = {
@@ -243,7 +243,7 @@ const Sidebar = React.memo(
         createLog({
           status: 'error',
           method: 'eth_sendTransaction',
-          message: error.message
+          message: error.message,
         });
       }
     };
@@ -302,8 +302,10 @@ const Sidebar = React.memo(
       <Main>
         <Body>
           <Menu>
-            <MenuButton onClick={toggleMenu}>Sandboxes</MenuButton>
-            {menuOpen && (
+            <MenuButton onClick={toggleSandboxMenu}>
+              Web3 React V8 Sandbox {sandboxMenuOpen ? '-' : '\u2630'}
+            </MenuButton>
+            {sandboxMenuOpen && (
               <MenuContainer>
                 <NavigationLink to="/sol-sandbox">Solana Sandbox</NavigationLink>
                 <NavigationLink to="/eth-sandbox">Ethereum Sandbox</NavigationLink>

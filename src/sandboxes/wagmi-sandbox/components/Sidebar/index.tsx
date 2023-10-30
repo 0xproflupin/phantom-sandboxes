@@ -189,20 +189,20 @@ interface Props {
 
 const Sidebar = React.memo((props: Props) => {
   const { connectedMethods } = props;
-  const [menuOpen, setMenuOpen] = React.useState(false);
+  const [sandboxMenuOpen, setSandboxMenuOpen] = React.useState(false);
   const { address } = useAccount();
   const { connect, connectors, isLoading, pendingConnector } = useConnect();
 
-  const toggleMenu = () => {
-    setMenuOpen(!menuOpen);
+  const toggleSandboxMenu = () => {
+    setSandboxMenuOpen(!sandboxMenuOpen);
   };
 
   return (
     <Main>
       <Body>
         <Menu>
-          <MenuButton onClick={toggleMenu}>Sandboxes</MenuButton>
-          {menuOpen && (
+          <MenuButton onClick={toggleSandboxMenu}>Wagmi Sandbox {sandboxMenuOpen ? '-' : '\u2630'}</MenuButton>
+          {sandboxMenuOpen && (
             <MenuContainer>
               <NavigationLink to="/sol-sandbox">Solana Sandbox</NavigationLink>
               <NavigationLink to="/eth-sandbox">Ethereum Sandbox</NavigationLink>
@@ -238,7 +238,11 @@ const Sidebar = React.memo((props: Props) => {
           // not connected
           <>
             {connectors.map((connector) => (
-              <Button disabled={!connector.ready} key={connector.id} onClick={() => connect({ connector, chainId: goerli.id })}>
+              <Button
+                disabled={!connector.ready}
+                key={connector.id}
+                onClick={() => connect({ connector, chainId: goerli.id })}
+              >
                 Connect to {connector.name}
                 {isLoading && pendingConnector?.id === connector.id && ' (connecting)'}
               </Button>

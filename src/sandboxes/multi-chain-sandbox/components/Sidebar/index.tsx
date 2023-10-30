@@ -221,29 +221,29 @@ interface Props {
 // =============================================================================
 const Sidebar = React.memo((props: Props) => {
   const { connectedAccounts, connectedMethods, connect } = props;
-  const [menuOpen, setMenuOpen] = React.useState(false);
+  const [sandboxMenuOpen, setSandboxMenuOpen] = React.useState(false);
 
-  const toggleMenu = () => {
-    setMenuOpen(!menuOpen);
+  const toggleSandboxMenu = () => {
+    setSandboxMenuOpen(!sandboxMenuOpen);
   };
   return (
     <Main>
       <Body>
         <Menu>
-          <MenuButton onClick={toggleMenu}>Sandboxes</MenuButton>
-            {menuOpen && (
-              <MenuContainer>
-                <NavigationLink to="/sol-sandbox">Solana Sandbox</NavigationLink>
-                <NavigationLink to="/eth-sandbox">Ethereum Sandbox</NavigationLink>
-                <NavigationLink to="/multi-chain-sandbox">Multi-Chain Sandbox</NavigationLink>
-                <NavigationLink to="/sol-adapter-sandbox">Solana Adapter Sandbox</NavigationLink>
-                <NavigationLink to="/rainbowkit-sandbox">Rainbowkit Sandbox</NavigationLink>
-                <NavigationLink to="/wagmi-sandbox">Wagmi Sandbox</NavigationLink>
-                <NavigationLink to="/web3-react-v6-sandbox">Web3 React V6 Sandbox</NavigationLink>
-                <NavigationLink to="/web3-react-v8-sandbox">Web3 React V8 Sandbox</NavigationLink>
-                <NavigationLink to="/experimental-sandbox">Experimental Sandbox</NavigationLink>
-              </MenuContainer>
-            )}
+          <MenuButton onClick={toggleSandboxMenu}>Multichain Sandbox {sandboxMenuOpen ? '-' : '\u2630'}</MenuButton>
+          {sandboxMenuOpen && (
+            <MenuContainer>
+              <NavigationLink to="/sol-sandbox">Solana Sandbox</NavigationLink>
+              <NavigationLink to="/eth-sandbox">Ethereum Sandbox</NavigationLink>
+              <NavigationLink to="/multi-chain-sandbox">Multi-Chain Sandbox</NavigationLink>
+              <NavigationLink to="/sol-adapter-sandbox">Solana Adapter Sandbox</NavigationLink>
+              <NavigationLink to="/rainbowkit-sandbox">Rainbowkit Sandbox</NavigationLink>
+              <NavigationLink to="/wagmi-sandbox">Wagmi Sandbox</NavigationLink>
+              <NavigationLink to="/web3-react-v6-sandbox">Web3 React V6 Sandbox</NavigationLink>
+              <NavigationLink to="/web3-react-v8-sandbox">Web3 React V8 Sandbox</NavigationLink>
+              <NavigationLink to="/experimental-sandbox">Experimental Sandbox</NavigationLink>
+            </MenuContainer>
+          )}
         </Menu>
         <Link>
           <img src="/images/phantom-icon-purple.png" alt="Phantom" width="75" />
@@ -254,15 +254,15 @@ const Sidebar = React.memo((props: Props) => {
             <div>
               <Pre>Connected as</Pre>
               <AccountRow>
-                <ChainIcon src={SupportedChainIcons.Ethereum} height='36px' />
+                <ChainIcon src={SupportedChainIcons.Ethereum} height="36px" />
                 <Badge>{connectedAccounts?.ethereum}</Badge>
               </AccountRow>
               <AccountRow>
-                <ChainIcon src={SupportedChainIcons.Polygon} height='36px' />
+                <ChainIcon src={SupportedChainIcons.Polygon} height="36px" />
                 <Badge>{connectedAccounts?.ethereum}</Badge>
               </AccountRow>
               <AccountRow>
-                <ChainIcon src={SupportedChainIcons.Solana} height='36px' />
+                <ChainIcon src={SupportedChainIcons.Solana} height="36px" />
                 <Badge>{connectedAccounts?.solana?.toBase58()}</Badge>
               </AccountRow>
               <Divider />
@@ -270,7 +270,7 @@ const Sidebar = React.memo((props: Props) => {
             <ChainHeader>
               <ChainIcon
                 src={SupportedChainIcons.Ethereum}
-                height='16px'
+                height="16px"
                 style={{ marginRight: '6px', borderRadius: '6px' }}
               />
               <Tag>{SupportedChainNames.EthereumGoerli}</Tag>
@@ -278,16 +278,18 @@ const Sidebar = React.memo((props: Props) => {
             {connectedMethods
               .filter((method) => method.chain === 'ethereum')
               .map((method, i) => (
-                <Button data-test-id={`ethereum-goerli-${method.name}`}
-                        key={`${method.name}-${i}`}
-                        onClick={() => method.onClick(SupportedEVMChainIds.EthereumGoerli)}>
+                <Button
+                  data-test-id={`ethereum-goerli-${method.name}`}
+                  key={`${method.name}-${i}`}
+                  onClick={() => method.onClick(SupportedEVMChainIds.EthereumGoerli)}
+                >
                   {method.name}
                 </Button>
               ))}
             <ChainHeader>
               <ChainIcon
                 src={SupportedChainIcons.Polygon}
-                height='16px'
+                height="16px"
                 style={{ marginRight: '6px', borderRadius: '6px' }}
               />
               <Tag>{SupportedChainNames.PolygonMainnet}</Tag>
@@ -306,7 +308,7 @@ const Sidebar = React.memo((props: Props) => {
             <ChainHeader>
               <ChainIcon
                 src={SupportedChainIcons.Solana}
-                height='16px'
+                height="16px"
                 style={{ marginRight: '6px', borderRadius: '6px' }}
               />
               <Tag>{SupportedChainNames.SolanaMainnet}</Tag>
@@ -314,16 +316,14 @@ const Sidebar = React.memo((props: Props) => {
             {connectedMethods
               .filter((method) => method.chain === 'solana')
               .map((method, i) => (
-                <Button
-                  data-test-id={`solana-${method.name}`}
-                  key={`${method.name}-${i}`} onClick={method.onClick}>
+                <Button data-test-id={`solana-${method.name}`} key={`${method.name}-${i}`} onClick={method.onClick}>
                   {method.name}
                 </Button>
               ))}
           </>
         ) : (
           // not connected
-          <Button data-testid='connect-to-phantom' onClick={connect} style={{ marginTop: '15px' }}>
+          <Button data-testid="connect-to-phantom" onClick={connect} style={{ marginTop: '15px' }}>
             Connect to Phantom
           </Button>
         )}
@@ -331,10 +331,10 @@ const Sidebar = React.memo((props: Props) => {
       {/* 😊 💕  */}
       <Tag>
         Made with{' '}
-        <span role='img' aria-label='Red Heart Emoji'>
+        <span role="img" aria-label="Red Heart Emoji">
           ❤️
         </span>{' '}
-        by the <a href='https://phantom.app'>Phantom</a> team
+        by the <a href="https://phantom.app">Phantom</a> team
       </Tag>
     </Main>
   );
