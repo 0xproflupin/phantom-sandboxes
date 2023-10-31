@@ -152,6 +152,34 @@ const NavigationLink = styled(NavLink)`
   }
 `;
 
+const NetworkSelectButton = styled.button`
+  display: block;
+  color: ${GRAY};
+  text-decoration: none;
+  margin-bottom: 5px;
+  font-size: 14px;
+  padding: 8px 12px;
+  width: 200px;
+  background-color: ${hexToRGB(PURPLE, 0.2)};
+  border: none;
+  border-radius: 6px;
+  text-align: center;
+  cursor: pointer;
+
+  &.active {
+    font-weight: bold;
+    color: ${PURPLE};
+  }
+
+  &:hover {
+    color: ${PURPLE};
+  }
+
+  &.selected {
+    color: ${PURPLE};
+  }
+`;
+
 const MenuButton = styled.button`
   margin-bottom: 10px;
   padding: 8px 12px;
@@ -212,10 +240,14 @@ const Sidebar = React.memo((props: Props) => {
               <NavigationLink to="/wagmi-sandbox">Wagmi Sandbox</NavigationLink>
               <NavigationLink to="/web3-react-v6-sandbox">Web3 React V6 Sandbox</NavigationLink>
               <NavigationLink to="/web3-react-v8-sandbox">Web3 React V8 Sandbox</NavigationLink>
-              <NavigationLink to="/web3-react-v8-sandbox">Web3 React V8 Sandbox</NavigationLink>
               <NavigationLink to="/experimental-sandbox">Experimental Sandbox</NavigationLink>
             </MenuContainer>
           )}
+        </Menu>
+        <Menu>
+          <MenuContainer>
+            <NetworkSelectButton className="selected"> Goerli Testnet</NetworkSelectButton>
+          </MenuContainer>
         </Menu>
         <Link>
           <img src="/images/phantom-icon-purple.png" alt="Phantom" width="75" />
