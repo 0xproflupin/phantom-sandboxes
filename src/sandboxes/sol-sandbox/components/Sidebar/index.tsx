@@ -152,9 +152,37 @@ const NavigationLink = styled(NavLink)`
   }
 `;
 
+const NetworkSelectButton = styled.button`
+  display: block;
+  color: ${GRAY};
+  text-decoration: none;
+  margin-bottom: 5px;
+  font-size: 14px;
+  padding: 8px 12px;
+  width: 200px;
+  background-color: ${hexToRGB(PURPLE, 0.2)};
+  border: none;
+  border-radius: 6px;
+  text-align: center;
+  cursor: pointer;
+
+  &.active {
+    font-weight: bold;
+    color: ${PURPLE};
+  }
+
+  &:hover {
+    color: ${PURPLE};
+  }
+
+  &.selected {
+    color: ${PURPLE};
+  }
+`;
+
 const MenuButton = styled.button`
   margin-bottom: 10px;
-  padding: 8px 12px;
+  padding: 8px 10px;
   width: 200px;
   background-color: ${PURPLE};
   color: ${WHITE};
@@ -183,6 +211,8 @@ interface Props {
   publicKey?: PublicKey;
   connectedMethods: ConnectedMethods[];
   connect: () => Promise<void>;
+  handleNetworkSwitch: (network: string) => void;
+  network: string;
 }
 
 // =============================================================================
@@ -190,31 +220,47 @@ interface Props {
 // =============================================================================
 
 const Sidebar = React.memo((props: Props) => {
-  const { publicKey, connectedMethods, connect } = props;
-  const [menuOpen, setMenuOpen] = React.useState(false);
+  const { publicKey, connectedMethods, connect, handleNetworkSwitch, network } = props;
+  const [sandboxMenuOpen, setSandboxMenuOpen] = React.useState(false);
 
-  const toggleMenu = () => {
-    setMenuOpen(!menuOpen);
+  const toggleSandboxMenu = () => {
+    setSandboxMenuOpen(!sandboxMenuOpen);
   };
 
   return (
     <Main>
       <Body>
         <Menu>
-          <MenuButton onClick={toggleMenu}>Sandboxes</MenuButton>
-            {menuOpen && (
-              <MenuContainer>
-                <NavigationLink to="/sol-sandbox">Solana Sandbox</NavigationLink>
-                <NavigationLink to="/eth-sandbox">Ethereum Sandbox</NavigationLink>
-                <NavigationLink to="/multi-chain-sandbox">Multi-Chain Sandbox</NavigationLink>
-                <NavigationLink to="/sol-adapter-sandbox">Solana Adapter Sandbox</NavigationLink>
-                <NavigationLink to="/rainbowkit-sandbox">Rainbowkit Sandbox</NavigationLink>
-                <NavigationLink to="/wagmi-sandbox">Wagmi Sandbox</NavigationLink>
-                <NavigationLink to="/web3-react-v6-sandbox">Web3 React V6 Sandbox</NavigationLink>
-                <NavigationLink to="/web3-react-v8-sandbox">Web3 React V8 Sandbox</NavigationLink>
-                <NavigationLink to="/experimental-sandbox">Experimental Sandbox</NavigationLink>
-              </MenuContainer>
-            )}
+          <MenuButton onClick={toggleSandboxMenu}>Solana Sandbox {sandboxMenuOpen ? '-' : '\u2630'}</MenuButton>
+          {sandboxMenuOpen && (
+            <MenuContainer>
+              <NavigationLink to="/sol-sandbox">Solana Sandbox</NavigationLink>
+              <NavigationLink to="/eth-sandbox">Ethereum Sandbox</NavigationLink>
+              <NavigationLink to="/multi-chain-sandbox">Multi-Chain Sandbox</NavigationLink>
+              <NavigationLink to="/sol-adapter-sandbox">Solana Adapter Sandbox</NavigationLink>
+              <NavigationLink to="/rainbowkit-sandbox">Rainbowkit Sandbox</NavigationLink>
+              <NavigationLink to="/wagmi-sandbox">Wagmi Sandbox</NavigationLink>
+              <NavigationLink to="/web3-react-v6-sandbox">Web3 React V6 Sandbox</NavigationLink>
+              <NavigationLink to="/web3-react-v8-sandbox">Web3 React V8 Sandbox</NavigationLink>
+              <NavigationLink to="/experimental-sandbox">Experimental Sandbox</NavigationLink>
+            </MenuContainer>
+          )}
+        </Menu>
+        <Menu>
+          <MenuContainer>
+            <NetworkSelectButton
+              onClick={() => handleNetworkSwitch('devnet')}
+              className={network == 'devnet' ? 'selected' : ''}
+            >
+              Devnet
+            </NetworkSelectButton>
+            <NetworkSelectButton
+              onClick={() => handleNetworkSwitch('mainnet')}
+              className={network == 'mainnet' ? 'selected' : ''}
+            >
+              Mainnet
+            </NetworkSelectButton>
+          </MenuContainer>
         </Menu>
         <Link>
           <img src="/images/phantom-icon-purple.png" alt="Phantom" width="75" />

@@ -152,6 +152,34 @@ const NavigationLink = styled(NavLink)`
   }
 `;
 
+const NetworkSelectButton = styled.button`
+  display: block;
+  color: ${GRAY};
+  text-decoration: none;
+  margin-bottom: 5px;
+  font-size: 14px;
+  padding: 8px 12px;
+  width: 200px;
+  background-color: ${hexToRGB(PURPLE, 0.2)};
+  border: none;
+  border-radius: 6px;
+  text-align: center;
+  cursor: pointer;
+
+  &.active {
+    font-weight: bold;
+    color: ${PURPLE};
+  }
+
+  &:hover {
+    color: ${PURPLE};
+  }
+
+  &.selected {
+    color: ${PURPLE};
+  }
+`;
+
 const MenuButton = styled.button`
   margin-bottom: 10px;
   padding: 8px 12px;
@@ -191,18 +219,18 @@ interface Props {
 const Sidebar = React.memo((props: Props) => {
   const { connectedMethods, unConnectedMethods } = props;
   const { account, active, chainId } = useWeb3React();
-  const [menuOpen, setMenuOpen] = React.useState(false);
+  const [sandboxMenuOpen, setSandboxMenuOpen] = React.useState(false);
 
-  const toggleMenu = () => {
-    setMenuOpen(!menuOpen);
+  const toggleSandboxMenu = () => {
+    setSandboxMenuOpen(!sandboxMenuOpen);
   };
 
   return (
     <Main>
       <Body>
         <Menu>
-          <MenuButton onClick={toggleMenu}>Sandboxes</MenuButton>
-          {menuOpen && (
+          <MenuButton onClick={toggleSandboxMenu}>Web3 React V6 Sandbox {sandboxMenuOpen ? '-' : '\u2630'}</MenuButton>
+          {sandboxMenuOpen && (
             <MenuContainer>
               <NavigationLink to="/sol-sandbox">Solana Sandbox</NavigationLink>
               <NavigationLink to="/eth-sandbox">Ethereum Sandbox</NavigationLink>
@@ -215,6 +243,11 @@ const Sidebar = React.memo((props: Props) => {
               <NavigationLink to="/experimental-sandbox">Experimental Sandbox</NavigationLink>
             </MenuContainer>
           )}
+        </Menu>
+        <Menu>
+          <MenuContainer>
+            <NetworkSelectButton className="selected"> Goerli Testnet</NetworkSelectButton>
+          </MenuContainer>
         </Menu>
         <Link>
           <img src="/images/phantom-icon-purple.png" alt="Phantom" width="75" />
