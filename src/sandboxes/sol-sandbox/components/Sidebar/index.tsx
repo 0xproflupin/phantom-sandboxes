@@ -250,13 +250,13 @@ const Sidebar = React.memo((props: Props) => {
           <MenuContainer>
             <NetworkSelectButton
               onClick={() => handleNetworkSwitch('devnet')}
-              className={network == 'devnet' ? 'selected' : ''}
+              className={network === 'devnet' ? 'selected' : ''}
             >
               Devnet
             </NetworkSelectButton>
             <NetworkSelectButton
               onClick={() => handleNetworkSwitch('mainnet')}
-              className={network == 'mainnet' ? 'selected' : ''}
+              className={network === 'mainnet' ? 'selected' : ''}
             >
               Mainnet
             </NetworkSelectButton>

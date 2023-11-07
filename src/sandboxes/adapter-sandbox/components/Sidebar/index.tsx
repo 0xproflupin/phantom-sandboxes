@@ -10,6 +10,7 @@ import { hexToRGB } from '../../utils';
 
 import Button from '../Button';
 import { ConnectedMethods } from '../../App';
+import { WalletAdapterNetwork } from '@solana/wallet-adapter-base';
 
 require('@solana/wallet-adapter-react-ui/styles.css');
 
@@ -214,6 +215,8 @@ interface Props {
   publicKey?: PublicKey;
   connectedMethods: ConnectedMethods[];
   connect: () => Promise<void>;
+  network: WalletAdapterNetwork;
+  setNetwork: (network: WalletAdapterNetwork) => void;
 }
 
 // =============================================================================
@@ -221,7 +224,7 @@ interface Props {
 // =============================================================================
 
 const Sidebar = React.memo((props: Props) => {
-  const { publicKey, connectedMethods } = props;
+  const { publicKey, connectedMethods, network, setNetwork } = props;
   const [sandboxMenuOpen, setSandboxMenuOpen] = React.useState(false);
 
   const toggleSandboxMenu = () => {
@@ -249,7 +252,18 @@ const Sidebar = React.memo((props: Props) => {
         </Menu>
         <Menu>
           <MenuContainer>
-            <NetworkSelectButton className="selected">Devnet</NetworkSelectButton>
+            <NetworkSelectButton
+              onClick={() => setNetwork(WalletAdapterNetwork.Devnet)}
+              className={network === WalletAdapterNetwork.Devnet ? 'selected' : ''}
+            >
+              Devnet
+            </NetworkSelectButton>
+            <NetworkSelectButton
+              onClick={() => setNetwork(WalletAdapterNetwork.Mainnet)}
+              className={network === WalletAdapterNetwork.Mainnet ? 'selected' : ''}
+            >
+              Mainnet
+            </NetworkSelectButton>
           </MenuContainer>
         </Menu>
         <Link>
