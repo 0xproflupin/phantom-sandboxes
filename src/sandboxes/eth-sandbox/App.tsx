@@ -54,6 +54,8 @@ interface Props {
   provider: Web3Provider;
   logs: TLog[];
   clearLogs: () => void;
+  logsVisibility: boolean;
+  toggleLogs: () => void;
 }
 
 // =============================================================================
@@ -67,6 +69,7 @@ interface Props {
 const useProps = (): Props => {
   const [provider, setProvider] = useState<Web3Provider | null>(null);
   const [logs, setLogs] = useState<TLog[]>([]);
+  const [logsVisibility, setLogsVisibility] = useState(false);
 
   const createLog = useCallback(
     (log: TLog) => {
@@ -78,6 +81,10 @@ const useProps = (): Props => {
   const clearLogs = useCallback(() => {
     setLogs([]);
   }, [setLogs]);
+
+  const toggleLogs = () => {
+    setLogsVisibility(!logsVisibility);
+  };
 
   useEffect(() => {
     (async () => {
@@ -253,6 +260,8 @@ const useProps = (): Props => {
     provider,
     logs,
     clearLogs,
+    logsVisibility,
+    toggleLogs,
   };
 };
 
@@ -261,15 +270,19 @@ const useProps = (): Props => {
 // =============================================================================
 
 const StatelessApp = React.memo((props: Props) => {
-  const { address, connectedMethods, handleConnect, logs, clearLogs } = props;
+  const { address, connectedMethods, handleConnect, logs, clearLogs, logsVisibility, toggleLogs } = props;
 
   return (
-    
     <StyledApp>
-      <Sidebar address={address} connectedMethods={connectedMethods} connect={handleConnect} />
-      <Logs address={address} logs={logs} clearLogs={clearLogs} />
+      <Sidebar
+        address={address}
+        connectedMethods={connectedMethods}
+        connect={handleConnect}
+        logsVisibility={logsVisibility}
+        toggleLogs={toggleLogs}
+      />
+      {logsVisibility && <Logs address={address} logs={logs} clearLogs={clearLogs} />}
     </StyledApp>
-      
   );
 });
 

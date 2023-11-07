@@ -193,6 +193,20 @@ const MenuButton = styled.button`
   }
 `;
 
+const ToggleLogsButton = styled(Button)`
+  margin-bottom: 10px;
+  padding: 8px 10px;
+  width: 200px;
+  background-color: ${GRAY};
+  color: ${WHITE};
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  &:hover {
+    background-color: ${hexToRGB(GRAY, 0.8)};
+  }
+`;
+
 const MenuContainer = styled.div`
   display: flex;
   flex-direction: column;
@@ -210,6 +224,8 @@ interface Props {
   address?: string;
   connectedMethods: ConnectedMethods[];
   connect: () => Promise<void>;
+  logsVisibility: boolean;
+  toggleLogs: () => void;
 }
 
 // =============================================================================
@@ -217,7 +233,7 @@ interface Props {
 // =============================================================================
 
 const Sidebar = React.memo((props: Props) => {
-  const { address, connectedMethods, connect } = props;
+  const { address, connectedMethods, connect, logsVisibility, toggleLogs } = props;
   const [sandboxMenuOpen, setSandboxMenuOpen] = React.useState(false);
 
   const toggleSandboxMenu = () => {
@@ -245,6 +261,9 @@ const Sidebar = React.memo((props: Props) => {
         </Menu>
         <Menu>
           <MenuContainer>
+            <ToggleLogsButton onClick={toggleLogs}>{`${
+              logsVisibility === true ? 'Hide' : 'Show'
+            } Logs`}</ToggleLogsButton>
             <NetworkSelectButton className="selected"> Goerli Testnet</NetworkSelectButton>
           </MenuContainer>
         </Menu>

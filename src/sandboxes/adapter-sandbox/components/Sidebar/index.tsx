@@ -184,6 +184,20 @@ const NetworkSelectButton = styled.button`
   }
 `;
 
+const ToggleLogsButton = styled(Button)`
+  margin-bottom: 10px;
+  padding: 8px 10px;
+  width: 200px;
+  background-color: ${GRAY};
+  color: ${WHITE};
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  &:hover {
+    background-color: ${hexToRGB(GRAY, 0.8)};
+  }
+`;
+
 const MenuButton = styled.button`
   margin-bottom: 10px;
   padding: 8px 12px;
@@ -217,6 +231,8 @@ interface Props {
   connect: () => Promise<void>;
   network: WalletAdapterNetwork;
   setNetwork: (network: WalletAdapterNetwork) => void;
+  logsVisibility: boolean;
+  toggleLogs: () => void;
 }
 
 // =============================================================================
@@ -224,7 +240,7 @@ interface Props {
 // =============================================================================
 
 const Sidebar = React.memo((props: Props) => {
-  const { publicKey, connectedMethods, network, setNetwork } = props;
+  const { publicKey, connectedMethods, network, setNetwork, logsVisibility, toggleLogs } = props;
   const [sandboxMenuOpen, setSandboxMenuOpen] = React.useState(false);
 
   const toggleSandboxMenu = () => {
@@ -252,6 +268,9 @@ const Sidebar = React.memo((props: Props) => {
         </Menu>
         <Menu>
           <MenuContainer>
+            <ToggleLogsButton onClick={toggleLogs}>{`${
+              logsVisibility === true ? 'Hide' : 'Show'
+            } Logs`}</ToggleLogsButton>
             <NetworkSelectButton
               onClick={() => setNetwork(WalletAdapterNetwork.Devnet)}
               className={network === WalletAdapterNetwork.Devnet ? 'selected' : ''}

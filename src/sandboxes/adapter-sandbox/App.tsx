@@ -87,6 +87,7 @@ const StatelessApp = ({ network, setNetwork }) => {
   } = useWallet();
   const { connection } = useConnection();
   const [logs, setLogs] = useState<TLog[]>([]);
+  const [logsVisibility, setLogsVisibility] = useState(false);
 
   const createLog = useCallback(
     (log: TLog) => {
@@ -98,6 +99,10 @@ const StatelessApp = ({ network, setNetwork }) => {
   const clearLogs = useCallback(() => {
     setLogs([]);
   }, [setLogs]);
+
+  const toggleLogs = () => {
+    setLogsVisibility(!logsVisibility);
+  };
 
   useEffect(() => {
     if (!publicKey || !wallet) return;
@@ -418,8 +423,10 @@ const StatelessApp = ({ network, setNetwork }) => {
         connect={handleConnect}
         network={network}
         setNetwork={setNetwork}
+        logsVisibility={logsVisibility}
+        toggleLogs={toggleLogs}
       />
-      <Logs publicKey={publicKey} logs={logs} clearLogs={clearLogs} />
+      {logsVisibility && <Logs publicKey={publicKey} logs={logs} clearLogs={clearLogs} />}
     </StyledApp>
   );
 };

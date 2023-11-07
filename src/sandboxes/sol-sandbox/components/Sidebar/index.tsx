@@ -264,6 +264,9 @@ const Sidebar = React.memo((props: Props) => {
         </Menu>
         <Menu>
           <MenuContainer>
+            <ToggleLogsButton onClick={toggleLogs}>{`${
+              logsVisibility === true ? 'Hide' : 'Show'
+            } Logs`}</ToggleLogsButton>
             <NetworkSelectButton
               onClick={() => handleNetworkSwitch('devnet')}
               className={network === 'devnet' ? 'selected' : ''}
@@ -276,9 +279,6 @@ const Sidebar = React.memo((props: Props) => {
             >
               Mainnet
             </NetworkSelectButton>
-            <ToggleLogsButton onClick={toggleLogs}>{`${
-              logsVisibility === true ? 'Hide' : 'Show'
-            } Logs`}</ToggleLogsButton>
           </MenuContainer>
         </Menu>
         <Link>

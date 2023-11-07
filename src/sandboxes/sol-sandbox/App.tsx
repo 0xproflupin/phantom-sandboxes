@@ -96,7 +96,7 @@ const useProps = (): Props => {
   const [network, setNetwork] = useState('devnet');
   const [connection, setConnection] = useState(new Connection(getConnectionUrl(network)));
   const [logs, setLogs] = useState<TLog[]>([]);
-  const [logsVisibility, setLogsVisibility] = useState(true);
+  const [logsVisibility, setLogsVisibility] = useState(false);
 
   const createLog = useCallback(
     (log: TLog) => {
