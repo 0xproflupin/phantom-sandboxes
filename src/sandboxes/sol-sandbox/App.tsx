@@ -77,6 +77,8 @@ interface Props {
   handleConnect: () => Promise<void>;
   logs: TLog[];
   clearLogs: () => void;
+  toggleLogs: () => void;
+  logsVisibility: boolean;
   handleNetworkSwitch: (newNetwork: string) => Promise<void>;
   network: string;
 }
@@ -94,6 +96,7 @@ const useProps = (): Props => {
   const [network, setNetwork] = useState('devnet');
   const [connection, setConnection] = useState(new Connection(getConnectionUrl(network)));
   const [logs, setLogs] = useState<TLog[]>([]);
+  const [logsVisibility, setLogsVisibility] = useState(true);
 
   const createLog = useCallback(
     (log: TLog) => {
@@ -105,6 +108,10 @@ const useProps = (): Props => {
   const clearLogs = useCallback(() => {
     setLogs([]);
   }, [setLogs]);
+
+  const toggleLogs = () => {
+    setLogsVisibility(!logsVisibility);
+  };
 
   useEffect(() => {
     (async () => {
@@ -462,6 +469,8 @@ const useProps = (): Props => {
     handleConnect,
     logs,
     clearLogs,
+    toggleLogs,
+    logsVisibility,
     handleNetworkSwitch,
     network,
   };
@@ -472,7 +481,17 @@ const useProps = (): Props => {
 // =============================================================================
 
 const StatelessApp = React.memo((props: Props) => {
-  const { publicKey, connectedMethods, handleConnect, logs, clearLogs, handleNetworkSwitch, network } = props;
+  const {
+    publicKey,
+    connectedMethods,
+    handleConnect,
+    logs,
+    clearLogs,
+    logsVisibility,
+    toggleLogs,
+    handleNetworkSwitch,
+    network,
+  } = props;
 
   return (
     <StyledApp>
@@ -482,8 +501,10 @@ const StatelessApp = React.memo((props: Props) => {
         connect={handleConnect}
         handleNetworkSwitch={handleNetworkSwitch}
         network={network}
+        logsVisibility={logsVisibility}
+        toggleLogs={toggleLogs}
       />
-      <Logs publicKey={publicKey} logs={logs} clearLogs={clearLogs} />
+      {logsVisibility && <Logs publicKey={publicKey} logs={logs} clearLogs={clearLogs} />}
     </StyledApp>
   );
 });
