@@ -11,7 +11,7 @@ import { Logs, Sidebar } from './components';
 
 import { useWeb3React, Web3ReactProvider } from '@web3-react/core';
 import { Web3Provider } from '@ethersproject/providers';
-import { PhantomConnector } from "web3-react-v6-phantom"
+import { PhantomConnector } from 'web3-react-v6-phantom';
 import { Signer } from 'ethers';
 import { parseUnits } from 'ethers/lib/utils';
 
@@ -64,6 +64,8 @@ interface Props {
   logs: TLog[];
   clearLogs: () => void;
   createLog: (log: TLog) => void;
+  logsVisibility: boolean;
+  toggleLogs: () => void;
 }
 
 // =============================================================================
@@ -72,6 +74,7 @@ interface Props {
 
 const useProps = (): Props => {
   const [logs, setLogs] = useState<TLog[]>([]);
+  const [logsVisibility, setLogsVisibility] = useState<boolean>(false);
 
   const createLog = useCallback(
     (log: TLog) => {
@@ -84,10 +87,16 @@ const useProps = (): Props => {
     setLogs([]);
   }, [setLogs]);
 
+  const toggleLogs = () => {
+    setLogsVisibility(!logsVisibility);
+  };
+
   return {
     logs,
     createLog,
     clearLogs,
+    logsVisibility,
+    toggleLogs,
   };
 };
 
@@ -96,7 +105,7 @@ const useProps = (): Props => {
 // =============================================================================
 
 const StatelessApp = React.memo((props: Props) => {
-  const { logs, clearLogs, createLog } = props;
+  const { logs, clearLogs, createLog, logsVisibility, toggleLogs } = props;
   const { library, activate, deactivate } = useWeb3React();
 
   const handleDisconnect = () => {
@@ -204,8 +213,13 @@ const StatelessApp = React.memo((props: Props) => {
 
   return (
     <StyledApp>
-      <Sidebar unConnectedMethods={unConnectedMethods} connectedMethods={connectedMethods} />
-      <Logs logs={logs} clearLogs={clearLogs} />
+      <Sidebar
+        unConnectedMethods={unConnectedMethods}
+        connectedMethods={connectedMethods}
+        logsVisibility={logsVisibility}
+        toggleLogs={toggleLogs}
+      />
+      {logsVisibility && <Logs logs={logs} clearLogs={clearLogs} />}
     </StyledApp>
   );
 });

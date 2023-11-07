@@ -16,7 +16,7 @@ import {
   useDisconnect,
 } from 'wagmi';
 import { publicProvider } from 'wagmi/providers/public';
-import { goerli } from 'wagmi/chains'
+import { goerli } from 'wagmi/chains';
 
 import { TLog } from './types';
 
@@ -32,12 +32,8 @@ const { publicClient, webSocketPublicClient, chains } = configureChains([goerli]
 const wagmiConfig = createConfig({
   publicClient,
   webSocketPublicClient,
-  connectors: [
-    new PhantomConnector({ chains }),
-  ]
+  connectors: [new PhantomConnector({ chains })],
 });
-
-
 
 // =============================================================================
 // Styled Components
@@ -77,6 +73,8 @@ interface Props {
   logs: TLog[];
   clearLogs: () => void;
   createLog: (log: TLog) => void;
+  logsVisibility: boolean;
+  toggleLogs: () => void;
 }
 
 // =============================================================================
@@ -89,6 +87,7 @@ interface Props {
  */
 const useProps = (): Props => {
   const [logs, setLogs] = useState<TLog[]>([]);
+  const [logsVisibility, setLogsVisibility] = useState(false);
 
   const createLog = useCallback(
     (log: TLog) => {
@@ -101,10 +100,16 @@ const useProps = (): Props => {
     setLogs([]);
   }, [setLogs]);
 
+  const toggleLogs = () => {
+    setLogsVisibility(!logsVisibility);
+  };
+
   return {
     createLog,
     logs,
     clearLogs,
+    logsVisibility,
+    toggleLogs,
   };
 };
 
@@ -113,13 +118,13 @@ const useProps = (): Props => {
 // =============================================================================
 
 const Stateless = React.memo((props: Props) => {
-  const { createLog, logs, clearLogs } = props;
-  const { address, status } = useAccount()
+  const { createLog, logs, clearLogs, logsVisibility, toggleLogs } = props;
+  const { address, status } = useAccount();
   let prevStatus = useRef(status);
   useEffect(() => {
     switch (status) {
       case 'disconnected':
-        if (status === prevStatus.current) break
+        if (status === prevStatus.current) break;
         createLog({
           status: 'warning',
           method: 'disconnect',
@@ -164,8 +169,8 @@ const Stateless = React.memo((props: Props) => {
   });
   const { config } = usePrepareSendTransaction({
     to: '0x0000000000000000000000000000000000000000', // Common for burning ETH
-    value: parseGwei('1', 'wei'), 
-  })
+    value: parseGwei('1', 'wei'),
+  });
 
   const { sendTransaction } = useSendTransaction({
     ...config,
@@ -186,7 +191,7 @@ const Stateless = React.memo((props: Props) => {
     },
   });
 
-  const { disconnect } = useDisconnect()
+  const { disconnect } = useDisconnect();
 
   const connectedMethods = useMemo(() => {
     return [
@@ -207,8 +212,8 @@ const Stateless = React.memo((props: Props) => {
 
   return (
     <StyledApp>
-      <Sidebar connectedMethods={connectedMethods} />
-      <Logs address={address} logs={logs} clearLogs={clearLogs} />
+      <Sidebar connectedMethods={connectedMethods} logsVisibility={logsVisibility} toggleLogs={toggleLogs} />
+      {logsVisibility && <Logs address={address} logs={logs} clearLogs={clearLogs} />}
     </StyledApp>
   );
 });
@@ -222,7 +227,7 @@ const App = () => {
 
   return (
     <WagmiConfig config={wagmiConfig}>
-        <Stateless {...props} />
+      <Stateless {...props} />
     </WagmiConfig>
   );
 };

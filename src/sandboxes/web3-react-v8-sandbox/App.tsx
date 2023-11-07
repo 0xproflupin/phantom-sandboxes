@@ -55,6 +55,7 @@ export type SidebarMethods =
 
 export const useLogs = (): logProps => {
   const [logs, setLogs] = useState<TLog[]>([]);
+  const [logsVisibility, setLogsVisibility] = useState<boolean>(false);
 
   const createLog = useCallback(
     (log: TLog) => {
@@ -67,10 +68,16 @@ export const useLogs = (): logProps => {
     setLogs([]);
   }, [setLogs]);
 
+  const toggleLogs = () => {
+    setLogsVisibility(!logsVisibility);
+  };
+
   return {
     logs,
     createLog,
     clearLogs,
+    logsVisibility,
+    toggleLogs,
   };
 };
 
@@ -79,8 +86,14 @@ const App = React.memo((logs: logProps) => {
 
   return (
     <StyledApp>
-      <Sidebar logProps={logs} connector={connector} hooks={hooks} />
-      <Logs logProps={logs} connector={connector} hooks={hooks} />
+      <Sidebar
+        logProps={logs}
+        connector={connector}
+        hooks={hooks}
+        logsVisibility={logs.logsVisibility}
+        toggleLogs={logs.toggleLogs}
+      />
+      {logs.logsVisibility && <Logs logProps={logs} connector={connector} hooks={hooks} />}
     </StyledApp>
   );
 });

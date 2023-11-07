@@ -22,6 +22,8 @@ export interface logProps {
   logs: TLog[];
   clearLogs: () => void;
   createLog: (log: TLog) => void;
+  logsVisibility: boolean;
+  toggleLogs: () => void;
 }
 
 export type Web3Provider = providers.Web3Provider;
