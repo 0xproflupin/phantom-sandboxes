@@ -10,6 +10,7 @@ import { hexToRGB } from '../../utils';
 
 import Button from '../Button';
 import { ConnectedMethods } from '../../App';
+import { WalletAdapterNetwork } from '@solana/wallet-adapter-base';
 
 require('@solana/wallet-adapter-react-ui/styles.css');
 
@@ -183,6 +184,20 @@ const NetworkSelectButton = styled.button`
   }
 `;
 
+const ToggleLogsButton = styled(Button)`
+  margin-bottom: 10px;
+  padding: 8px 10px;
+  width: 200px;
+  background-color: ${GRAY};
+  color: ${WHITE};
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  &:hover {
+    background-color: ${hexToRGB(GRAY, 0.8)};
+  }
+`;
+
 const MenuButton = styled.button`
   margin-bottom: 10px;
   padding: 8px 12px;
@@ -214,6 +229,10 @@ interface Props {
   publicKey?: PublicKey;
   connectedMethods: ConnectedMethods[];
   connect: () => Promise<void>;
+  network: WalletAdapterNetwork;
+  setNetwork: (network: WalletAdapterNetwork) => void;
+  logsVisibility: boolean;
+  toggleLogs: () => void;
 }
 
 // =============================================================================
@@ -221,7 +240,7 @@ interface Props {
 // =============================================================================
 
 const Sidebar = React.memo((props: Props) => {
-  const { publicKey, connectedMethods } = props;
+  const { publicKey, connectedMethods, network, setNetwork, logsVisibility, toggleLogs } = props;
   const [sandboxMenuOpen, setSandboxMenuOpen] = React.useState(false);
 
   const toggleSandboxMenu = () => {
@@ -249,7 +268,21 @@ const Sidebar = React.memo((props: Props) => {
         </Menu>
         <Menu>
           <MenuContainer>
-            <NetworkSelectButton className="selected">Devnet</NetworkSelectButton>
+            <ToggleLogsButton onClick={toggleLogs}>{`${
+              logsVisibility === true ? 'Hide' : 'Show'
+            } Logs`}</ToggleLogsButton>
+            <NetworkSelectButton
+              onClick={() => setNetwork(WalletAdapterNetwork.Devnet)}
+              className={network === WalletAdapterNetwork.Devnet ? 'selected' : ''}
+            >
+              Devnet
+            </NetworkSelectButton>
+            <NetworkSelectButton
+              onClick={() => setNetwork(WalletAdapterNetwork.Mainnet)}
+              className={network === WalletAdapterNetwork.Mainnet ? 'selected' : ''}
+            >
+              Mainnet
+            </NetworkSelectButton>
           </MenuContainer>
         </Menu>
         <Link>

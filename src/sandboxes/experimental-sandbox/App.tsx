@@ -7,13 +7,7 @@ import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import styled from 'styled-components';
 import { PublicKey } from '@solana/web3.js';
 
-import {
-  createSignInData,
-  createSignInErrorData,
-  getProvider,
-  signMessage,
-  signIn,
-} from './utils';
+import { createSignInData, createSignInErrorData, getProvider, signMessage, signIn } from './utils';
 
 import { PhantomProvider, TLog } from './types';
 
@@ -39,20 +33,19 @@ const StyledApp = styled.div`
 const message = 'To avoid digital dognappers, sign below to authenticate with CryptoCorgis.';
 const sleep = (timeInMS) => new Promise((resolve) => setTimeout(resolve, timeInMS));
 
-
 // =============================================================================
 // Typedefs
 // =============================================================================
 
 export type ConnectedMethods =
   | {
-    name: string;
-    onClick: () => Promise<string>;
-  }
+      name: string;
+      onClick: () => Promise<string>;
+    }
   | {
-    name: string;
-    onClick: () => Promise<void>;
-  };
+      name: string;
+      onClick: () => Promise<void>;
+    };
 
 interface Props {
   publicKey: PublicKey | null;
@@ -60,6 +53,8 @@ interface Props {
   handleConnect: () => Promise<void>;
   logs: TLog[];
   clearLogs: () => void;
+  logsVisibility: boolean;
+  toggleLogs: () => void;
 }
 
 // =============================================================================
@@ -72,7 +67,8 @@ interface Props {
  */
 const useProps = (): Props => {
   const [provider, setProvider] = useState<PhantomProvider | null>(null);
-  const [logs, setLogs] = useState<TLog[]>([]); 
+  const [logs, setLogs] = useState<TLog[]>([]);
+  const [logsVisibility, setLogsVisibility] = useState(false);
 
   const createLog = useCallback(
     (log: TLog) => {
@@ -85,6 +81,10 @@ const useProps = (): Props => {
     setLogs([]);
   }, [setLogs]);
 
+  const toggleLogs = () => {
+    setLogsVisibility(!logsVisibility);
+  };
+
   useEffect(() => {
     (async () => {
       // sleep for 100 ms to give time to inject
@@ -92,7 +92,7 @@ const useProps = (): Props => {
       setProvider(getProvider());
     })();
   }, []);
-  
+
   useEffect(() => {
     if (!provider) return;
 
@@ -159,7 +159,7 @@ const useProps = (): Props => {
     return () => {
       provider.disconnect();
     };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [createLog, provider]);
 
   /** SignMessage */
@@ -189,7 +189,7 @@ const useProps = (): Props => {
     const signInData = await createSignInData();
 
     try {
-      const {address, signedMessage, signature} = await signIn(provider, signInData);
+      const { address, signedMessage, signature } = await signIn(provider, signInData);
       const message = new TextDecoder().decode(signedMessage);
       createLog({
         status: 'success',
@@ -211,7 +211,7 @@ const useProps = (): Props => {
     const signInData = await createSignInErrorData(provider.publicKey.toString());
 
     try {
-      const {address, signedMessage, signature} = await signIn(provider, signInData);
+      const { address, signedMessage, signature } = await signIn(provider, signInData);
       createLog({
         status: 'success',
         method: 'signMessage',
@@ -260,12 +260,7 @@ const useProps = (): Props => {
         onClick: handleDisconnect,
       },
     ];
-  }, [
-    handleSignMessage,
-    handleSignIn,
-    handleSignInError,
-    handleDisconnect,
-  ]);
+  }, [handleSignMessage, handleSignIn, handleSignInError, handleDisconnect]);
 
   return {
     publicKey: provider?.publicKey || null,
@@ -273,6 +268,8 @@ const useProps = (): Props => {
     handleConnect: handleSignIn,
     logs,
     clearLogs,
+    logsVisibility,
+    toggleLogs,
   };
 };
 
@@ -281,12 +278,18 @@ const useProps = (): Props => {
 // =============================================================================
 
 const StatelessApp = React.memo((props: Props) => {
-  const { publicKey, connectedMethods, handleConnect, logs, clearLogs } = props;
+  const { publicKey, connectedMethods, handleConnect, logs, clearLogs, logsVisibility, toggleLogs } = props;
 
   return (
     <StyledApp>
-      <Sidebar publicKey={publicKey} connectedMethods={connectedMethods} connect={handleConnect} />
-      <Logs publicKey={publicKey} logs={logs} clearLogs={clearLogs} />
+      <Sidebar
+        publicKey={publicKey}
+        connectedMethods={connectedMethods}
+        connect={handleConnect}
+        logsVisibility={logsVisibility}
+        toggleLogs={toggleLogs}
+      />
+      {logsVisibility && <Logs publicKey={publicKey} logs={logs} clearLogs={clearLogs} />}
     </StyledApp>
   );
 });

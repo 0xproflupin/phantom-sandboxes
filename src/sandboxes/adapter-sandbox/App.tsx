@@ -7,7 +7,7 @@ import React, { useState, useCallback, useEffect, useMemo } from 'react';
 import styled from 'styled-components';
 import { useWallet, useConnection, WalletProvider, ConnectionProvider } from '@solana/wallet-adapter-react';
 import { WalletAdapterNetwork } from '@solana/wallet-adapter-base';
-import { WalletModalProvider } from "@solana/wallet-adapter-react-ui";
+import { WalletModalProvider } from '@solana/wallet-adapter-react-ui';
 
 import {
   createAddressLookupTable,
@@ -47,25 +47,47 @@ const StyledApp = styled.div`
 
 const message = 'To avoid digital dognappers, sign below to authenticate with CryptoCorgis.';
 
+const getConnectionUrl = (network: WalletAdapterNetwork): string => {
+  switch (network) {
+    case WalletAdapterNetwork.Devnet:
+      // NB: This URL will only work for Phantom sandbox apps! Please do not use this for your project.
+      return `https://rpc-devnet.helius.xyz/?api-key=${process.env.REACT_APP_HELIUS_API}`;
+    case WalletAdapterNetwork.Mainnet:
+      // NB: This URL will only work for Phantom sandbox apps! Please do not use this for your project.
+      return `https://rpc.helius.xyz/?api-key=${process.env.REACT_APP_HELIUS_API}`;
+    default:
+      throw new Error(`Invalid network: ${network}`);
+  }
+};
+
 // =============================================================================
 // Typedefs
 // =============================================================================
 
 export type ConnectedMethods =
   | {
-    name: string;
-    onClick: () => Promise<string>;
-  }
+      name: string;
+      onClick: () => Promise<string>;
+    }
   | {
-    name: string;
-    onClick: () => Promise<void>;
-  };
+      name: string;
+      onClick: () => Promise<void>;
+    };
 
-
-const StatelessApp = () => {
-  const { wallet, publicKey, connect, disconnect, signMessage: signMsg, signTransaction: signTx, signAllTransactions: signAllTx, sendTransaction: sendTx } = useWallet();
+const StatelessApp = ({ network, setNetwork }) => {
+  const {
+    wallet,
+    publicKey,
+    connect,
+    disconnect,
+    signMessage: signMsg,
+    signTransaction: signTx,
+    signAllTransactions: signAllTx,
+    sendTransaction: sendTx,
+  } = useWallet();
   const { connection } = useConnection();
   const [logs, setLogs] = useState<TLog[]>([]);
+  const [logsVisibility, setLogsVisibility] = useState(false);
 
   const createLog = useCallback(
     (log: TLog) => {
@@ -77,6 +99,10 @@ const StatelessApp = () => {
   const clearLogs = useCallback(() => {
     setLogs([]);
   }, [setLogs]);
+
+  const toggleLogs = () => {
+    setLogsVisibility(!logsVisibility);
+  };
 
   useEffect(() => {
     if (!publicKey || !wallet) return;
@@ -391,8 +417,16 @@ const StatelessApp = () => {
 
   return (
     <StyledApp>
-      <Sidebar publicKey={publicKey} connectedMethods={connectedMethods} connect={handleConnect} />
-      <Logs publicKey={publicKey} logs={logs} clearLogs={clearLogs} />
+      <Sidebar
+        publicKey={publicKey}
+        connectedMethods={connectedMethods}
+        connect={handleConnect}
+        network={network}
+        setNetwork={setNetwork}
+        logsVisibility={logsVisibility}
+        toggleLogs={toggleLogs}
+      />
+      {logsVisibility && <Logs publicKey={publicKey} logs={logs} clearLogs={clearLogs} />}
     </StyledApp>
   );
 };
@@ -401,9 +435,9 @@ const StatelessApp = () => {
 // Main Component
 // =============================================================================
 const App = () => {
-  const network = WalletAdapterNetwork.Mainnet;
+  const [network, setNetwork] = useState(WalletAdapterNetwork.Devnet);
 
-  const endpoint = `https://rpc-devnet.helius.xyz/?api-key=${process.env.REACT_APP_HELIUS_API}`;
+  const endpoint = getConnectionUrl(network);
 
   const wallets = useMemo(
     () => [], // confirmed also with `() => []` for wallet-standard only
@@ -416,7 +450,7 @@ const App = () => {
       <ConnectionProvider endpoint={endpoint}>
         <WalletProvider wallets={wallets} autoConnect>
           <WalletModalProvider>
-            <StatelessApp />
+            <StatelessApp network={network} setNetwork={setNetwork} />
           </WalletModalProvider>
         </WalletProvider>
       </ConnectionProvider>

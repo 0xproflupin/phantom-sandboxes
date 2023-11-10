@@ -198,6 +198,20 @@ const MenuButton = styled.button`
   }
 `;
 
+const ToggleLogsButton = styled(Button)`
+  margin-bottom: 10px;
+  padding: 8px 10px;
+  width: 200px;
+  background-color: ${GRAY};
+  color: ${WHITE};
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  &:hover {
+    background-color: ${hexToRGB(GRAY, 0.8)};
+  }
+`;
+
 const MenuContainer = styled.div`
   display: flex;
   flex-direction: column;
@@ -219,7 +233,19 @@ const msg = `0x${Buffer.from(message, 'utf8').toString('hex')}`;
 // =============================================================================
 
 const Sidebar = React.memo(
-  ({ connector, hooks, logProps }: { connector: Connector; hooks: Web3ReactSelectedHooks; logProps: logProps }) => {
+  ({
+    connector,
+    hooks,
+    logProps,
+    logsVisibility,
+    toggleLogs,
+  }: {
+    connector: Connector;
+    hooks: Web3ReactSelectedHooks;
+    logProps: logProps;
+    logsVisibility: boolean;
+    toggleLogs: () => void;
+  }) => {
     const { useSelectedAccount, useSelectedIsActive, useSelectedIsActivating } = hooks;
     const isActivating = useSelectedIsActivating(connector);
     const isActive = useSelectedIsActive(connector);
@@ -349,6 +375,9 @@ const Sidebar = React.memo(
           </Menu>
           <Menu>
             <MenuContainer>
+              <ToggleLogsButton onClick={toggleLogs}>{`${
+                logsVisibility === true ? 'Hide' : 'Show'
+              } Logs`}</ToggleLogsButton>
               <NetworkSelectButton className="selected"> Goerli Testnet</NetworkSelectButton>
             </MenuContainer>
           </Menu>

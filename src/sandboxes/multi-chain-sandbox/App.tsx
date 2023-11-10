@@ -78,6 +78,8 @@ interface Props {
   handleConnect: () => Promise<void>;
   logs: TLog[];
   clearLogs: () => void;
+  logsVisibility: boolean;
+  toggleLogs: () => void;
 }
 
 // =============================================================================
@@ -90,6 +92,7 @@ interface Props {
 const useProps = (provider: PhantomInjectedProvider | null): Props => {
   /** Logs to display in the Sandbox console */
   const [logs, setLogs] = useState<TLog[]>([]);
+  const [logsVisibility, setLogsVisibility] = useState(false);
 
   const createLog = useCallback(
     (log: TLog) => {
@@ -101,6 +104,10 @@ const useProps = (provider: PhantomInjectedProvider | null): Props => {
   const clearLogs = useCallback(() => {
     setLogs([]);
   }, [setLogs]);
+
+  const toggleLogs = () => {
+    setLogsVisibility(!logsVisibility);
+  };
 
   const [ethereumChainId, setEthereumChainId] = useEthereumChainIdState(provider?.ethereum);
   const [ethereumSelectedAddres, setEthereumSelectedAddress] = useEthereumSelectedAddress(provider?.ethereum);
@@ -325,6 +332,8 @@ const useProps = (provider: PhantomInjectedProvider | null): Props => {
     handleConnect,
     logs,
     clearLogs,
+    logsVisibility,
+    toggleLogs,
   };
 };
 
@@ -333,7 +342,16 @@ const useProps = (provider: PhantomInjectedProvider | null): Props => {
 // =============================================================================
 
 const StatelessApp = React.memo((props: Props) => {
-  const { connectedAccounts, connectedEthereumChainId, connectedMethods, handleConnect, logs, clearLogs } = props;
+  const {
+    connectedAccounts,
+    connectedEthereumChainId,
+    connectedMethods,
+    handleConnect,
+    logs,
+    clearLogs,
+    logsVisibility,
+    toggleLogs,
+  } = props;
 
   return (
     <StyledApp>
@@ -342,8 +360,10 @@ const StatelessApp = React.memo((props: Props) => {
         connectedEthereumChainId={connectedEthereumChainId}
         connectedMethods={connectedMethods}
         connect={handleConnect}
+        logsVisibility={logsVisibility}
+        toggleLogs={toggleLogs}
       />
-      <Logs connectedAccounts={connectedAccounts} logs={logs} clearLogs={clearLogs} />
+      {logsVisibility && <Logs connectedAccounts={connectedAccounts} logs={logs} clearLogs={clearLogs} />}
     </StyledApp>
   );
 });

@@ -51,6 +51,7 @@ const getConnectionUrl = (network: string): string => {
       // NB: This URL will only work for Phantom sandbox apps! Please do not use this for your project.
       return `https://rpc-devnet.helius.xyz/?api-key=${process.env.REACT_APP_HELIUS_API}`;
     case 'mainnet':
+      // NB: This URL will only work for Phantom sandbox apps! Please do not use this for your project.
       return `https://rpc.helius.xyz/?api-key=${process.env.REACT_APP_HELIUS_API}`;
     default:
       throw new Error(`Invalid network: ${network}`);
@@ -76,6 +77,8 @@ interface Props {
   handleConnect: () => Promise<void>;
   logs: TLog[];
   clearLogs: () => void;
+  toggleLogs: () => void;
+  logsVisibility: boolean;
   handleNetworkSwitch: (newNetwork: string) => Promise<void>;
   network: string;
 }
@@ -90,10 +93,10 @@ interface Props {
  */
 const useProps = (): Props => {
   const [provider, setProvider] = useState<PhantomProvider | null>(null);
-  // TODO: create prop for network pass through to sidebar
   const [network, setNetwork] = useState('devnet');
   const [connection, setConnection] = useState(new Connection(getConnectionUrl(network)));
   const [logs, setLogs] = useState<TLog[]>([]);
+  const [logsVisibility, setLogsVisibility] = useState(false);
 
   const createLog = useCallback(
     (log: TLog) => {
@@ -105,6 +108,10 @@ const useProps = (): Props => {
   const clearLogs = useCallback(() => {
     setLogs([]);
   }, [setLogs]);
+
+  const toggleLogs = () => {
+    setLogsVisibility(!logsVisibility);
+  };
 
   useEffect(() => {
     (async () => {
@@ -393,6 +400,7 @@ const useProps = (): Props => {
     }
   }, [createLog, provider]);
 
+  /** Network Switch */
   const handleNetworkSwitch = useCallback(
     async (newNetwork: string) => {
       try {
@@ -461,6 +469,8 @@ const useProps = (): Props => {
     handleConnect,
     logs,
     clearLogs,
+    toggleLogs,
+    logsVisibility,
     handleNetworkSwitch,
     network,
   };
@@ -471,7 +481,17 @@ const useProps = (): Props => {
 // =============================================================================
 
 const StatelessApp = React.memo((props: Props) => {
-  const { publicKey, connectedMethods, handleConnect, logs, clearLogs, handleNetworkSwitch, network } = props;
+  const {
+    publicKey,
+    connectedMethods,
+    handleConnect,
+    logs,
+    clearLogs,
+    logsVisibility,
+    toggleLogs,
+    handleNetworkSwitch,
+    network,
+  } = props;
 
   return (
     <StyledApp>
@@ -481,8 +501,10 @@ const StatelessApp = React.memo((props: Props) => {
         connect={handleConnect}
         handleNetworkSwitch={handleNetworkSwitch}
         network={network}
+        logsVisibility={logsVisibility}
+        toggleLogs={toggleLogs}
       />
-      <Logs publicKey={publicKey} logs={logs} clearLogs={clearLogs} />
+      {logsVisibility && <Logs publicKey={publicKey} logs={logs} clearLogs={clearLogs} />}
     </StyledApp>
   );
 });

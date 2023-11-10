@@ -224,6 +224,20 @@ const MenuButton = styled.button`
   }
 `;
 
+const ToggleLogsButton = styled(Button)`
+  margin-bottom: 10px;
+  padding: 8px 10px;
+  width: 200px;
+  background-color: ${GRAY};
+  color: ${WHITE};
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  &:hover {
+    background-color: ${hexToRGB(GRAY, 0.8)};
+  }
+`;
+
 const MenuContainer = styled.div`
   display: flex;
   flex-direction: column;
@@ -242,13 +256,15 @@ interface Props {
   connectedEthereumChainId: SupportedEVMChainIds | null;
   connectedAccounts: ConnectedAccounts;
   connect: () => Promise<void>;
+  logsVisibility: boolean;
+  toggleLogs: () => void;
 }
 
 // =============================================================================
 // Main Component
 // =============================================================================
 const Sidebar = React.memo((props: Props) => {
-  const { connectedAccounts, connectedMethods, connect } = props;
+  const { connectedAccounts, connectedMethods, connect, logsVisibility, toggleLogs } = props;
   const [sandboxMenuOpen, setSandboxMenuOpen] = React.useState(false);
 
   const toggleSandboxMenu = () => {
@@ -275,6 +291,9 @@ const Sidebar = React.memo((props: Props) => {
         </Menu>
         <Menu>
           <MenuContainer>
+            <ToggleLogsButton onClick={toggleLogs}>{`${
+              logsVisibility === true ? 'Hide' : 'Show'
+            } Logs`}</ToggleLogsButton>
             <NetworkSelectButton className="selected">Ethereum Goerli Testnet</NetworkSelectButton>
             <NetworkSelectButton className="selected">Polygon Mainnet</NetworkSelectButton>
             <NetworkSelectButton className="selected">Solana Devnet</NetworkSelectButton>
