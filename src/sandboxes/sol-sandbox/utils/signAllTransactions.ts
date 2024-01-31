@@ -11,12 +11,10 @@ import { PhantomProvider } from '../types';
  */
 const signAllTransactions = async (
   provider: PhantomProvider,
-  transaction1: Transaction | VersionedTransaction,
-  transaction2: Transaction | VersionedTransaction
+  transactions: (Transaction | VersionedTransaction)[]
 ): Promise<(Transaction | VersionedTransaction)[]> => {
   try {
-    const transactions = await provider.signAllTransactions([transaction1, transaction2]);
-    return transactions;
+    return await provider.signAllTransactions(transactions);
   } catch (error) {
     console.warn(error);
     throw new Error(error.message);

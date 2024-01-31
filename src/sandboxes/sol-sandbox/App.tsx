@@ -24,6 +24,7 @@ import {
 import { PhantomProvider, TLog } from './types';
 
 import { Logs, Sidebar } from './components';
+import { toast } from 'react-toastify';
 
 // =============================================================================
 // Styled Components
@@ -206,13 +207,16 @@ const useProps = (): Props => {
         method: 'signAndSendTransaction',
         message: `Signed and submitted transaction ${signature}.`,
       });
-      pollSignatureStatus(signature, connection, createLog);
+      pollSignatureStatus(signature, connection, createLog).then(() => {
+        toast.success('Transaction confirmed');
+      });
     } catch (error) {
       createLog({
         status: 'error',
         method: 'signAndSendTransaction',
         message: error.message,
       });
+      toast.error("Transaction couldn't be confirmed");
     }
   }, [createLog, provider, connection]);
 
@@ -233,8 +237,11 @@ const useProps = (): Props => {
         method: 'signAndSendTransactionV0',
         message: `Signed and submitted transactionV0 ${signature}.`,
       });
-      pollSignatureStatus(signature, connection, createLog);
+      pollSignatureStatus(signature, connection, createLog).then(() => {
+        toast.success('Transaction confirmed');
+      });
     } catch (error) {
+      toast.error("Transaction couldn't be confirmed");
       createLog({
         status: 'error',
         method: 'signAndSendTransactionV0',
@@ -284,8 +291,11 @@ const useProps = (): Props => {
         method: 'signAndSendTransactionV0WithLookupTable',
         message: `Signed and submitted transactionV0 with Address Lookup Table ${signature}.`,
       });
-      pollSignatureStatus(signature, connection, createLog);
+      pollSignatureStatus(signature, connection, createLog).then(() => {
+        toast.success('Transaction confirmed');
+      });
     } catch (error) {
+      toast.error("Transaction couldn't be confirmed");
       createLog({
         status: 'error',
         method: 'signAndSendTransactionV0WithLookupTable',
@@ -311,7 +321,9 @@ const useProps = (): Props => {
         method: 'signTransaction',
         message: `Transaction signed: ${JSON.stringify(signedTransaction)}`,
       });
+      toast.success('Transaction signed');
     } catch (error) {
+      toast.error("Transaction couldn't be signed");
       createLog({
         status: 'error',
         method: 'signTransaction',
@@ -321,33 +333,40 @@ const useProps = (): Props => {
   }, [createLog, provider, connection]);
 
   /** SignAllTransactions */
-  const handleSignAllTransactions = useCallback(async () => {
-    if (!provider) return;
+  const handleSignAllTransactions = useCallback(
+    async (numTransactions: number) => {
+      if (!provider) return;
 
-    try {
-      const transactions = [
-        await createTransferTransaction(provider.publicKey, connection),
-        await createTransferTransaction(provider.publicKey, connection),
-      ];
-      createLog({
-        status: 'info',
-        method: 'signAllTransactions',
-        message: `Requesting signature for: ${JSON.stringify(transactions)}`,
-      });
-      const signedTransactions = await signAllTransactions(provider, transactions[0], transactions[1]);
-      createLog({
-        status: 'success',
-        method: 'signAllTransactions',
-        message: `Transactions signed: ${JSON.stringify(signedTransactions)}`,
-      });
-    } catch (error) {
-      createLog({
-        status: 'error',
-        method: 'signAllTransactions',
-        message: error.message,
-      });
-    }
-  }, [createLog, provider, connection]);
+      try {
+        const transactions = [];
+
+        for (let i = 0; i < numTransactions; i++) {
+          const transaction = await createTransferTransaction(provider.publicKey, connection);
+          transactions.push(transaction);
+        }
+        createLog({
+          status: 'info',
+          method: 'signAllTransactions',
+          message: `Requesting signature for: ${JSON.stringify(transactions)}`,
+        });
+        const signedTransactions = await signAllTransactions(provider, transactions);
+        createLog({
+          status: 'success',
+          method: 'signAllTransactions',
+          message: `Transactions signed: ${JSON.stringify(signedTransactions)}`,
+        });
+        toast.success('Transactions signed');
+      } catch (error) {
+        toast.error("Transactions couldn't be signed");
+        createLog({
+          status: 'error',
+          method: 'signAllTransactions',
+          message: error.message,
+        });
+      }
+    },
+    [createLog, provider, connection]
+  );
 
   /** SignMessage */
   const handleSignMessage = useCallback(async () => {
@@ -422,6 +441,22 @@ const useProps = (): Props => {
     [createLog, setConnection, setNetwork]
   );
 
+  /** Spam Sign Transaction */
+  const handleSpamSignTransaction = useCallback(async () => {
+    // Call sign transaction 20 times
+    for (let i = 0; i < 20; i++) {
+      await handleSignTransaction();
+    }
+  }, [handleSignTransaction]);
+
+  /** Spam Sign Message */
+  const handleSpamSignMessage = useCallback(async () => {
+    // Call sign message 20 times
+    for (let i = 0; i < 20; i++) {
+      await handleSignMessage();
+    }
+  }, [handleSignMessage]);
+
   const connectedMethods = useMemo(() => {
     return [
       {
@@ -442,11 +477,23 @@ const useProps = (): Props => {
       },
       {
         name: 'Sign All Transactions',
-        onClick: handleSignAllTransactions,
+        onClick: () => handleSignAllTransactions(2),
       },
       {
         name: 'Sign Message',
         onClick: handleSignMessage,
+      },
+      {
+        name: 'Spam Sign Transaction (20x)',
+        onClick: handleSpamSignTransaction,
+      },
+      {
+        name: 'Spam Sign Message (20x)',
+        onClick: handleSpamSignMessage,
+      },
+      {
+        name: 'Sign 200 transactions at the same time',
+        onClick: () => handleSignAllTransactions(200),
       },
       {
         name: 'Disconnect',
