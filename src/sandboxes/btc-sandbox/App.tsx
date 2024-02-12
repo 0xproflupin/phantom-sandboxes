@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { TLog } from './types';
-import { Sidebar } from './components';
+import { Logs, Sidebar } from './components';
 import styled from 'styled-components';
-import getProvider from './utils/getProvider';
+import { getProvider } from './utils';
 
 const StyledApp = styled.div`
   display: flex;
@@ -13,16 +13,30 @@ const StyledApp = styled.div`
   }
 `;
 
+// =============================================================================
+// Constants
+// =============================================================================
+
 const sleep = (timeInMS) => new Promise((resolve) => setTimeout(resolve, timeInMS));
 
 interface Props {
-  handleConnect: () => void;
+  handleConnect: () => Promise<void>;
+  logsVisibility: boolean;
   logs: TLog[];
 }
 
 const useProps = () => {
   const [provider, setProvider] = useState(null);
   const [logs, setLogs] = useState<TLog[]>([]);
+  const [logsVisibility, setLogsVisibility] = useState(false);
+
+  const clearLogs = useCallback(() => {
+    setLogs([]);
+  }, [setLogs]);
+
+  const toggleLogs = () => {
+    setLogsVisibility(!logsVisibility);
+  };
 
   const createLog = useCallback(
     (log: TLog) => {
@@ -60,27 +74,39 @@ const useProps = () => {
     } catch (error) {
       createLog({
         status: 'error',
-        message: 'Failed to connect to account',
-        method: 'connect',
+        message: 'Failed to connect to bitcoin accounts',
+        method: error.message,
       });
     }
   }, [createLog, provider]);
 
   return {
-    logs,
+    clearLogs,
     handleConnect,
+    logs,
+    logsVisibility,
+    toggleLogs,
   };
 };
 
+// =============================================================================
+// Stateless Component
+// =============================================================================
+
 const StatelessApp = React.memo((props: Props) => {
-  const { logs, handleConnect } = useProps();
+  const { clearLogs, logs, handleConnect, logsVisibility, toggleLogs } = useProps();
 
   return (
     <StyledApp>
-      <Sidebar connect={handleConnect} />
+      <Sidebar connect={handleConnect} logsVisibility={logsVisibility} toggleLogs={toggleLogs} />
+      {logsVisibility && <Logs logs={logs} clearLogs={clearLogs} />}
     </StyledApp>
   );
 });
+
+// =============================================================================
+// Main Component
+// =============================================================================
 
 const App = () => {
   const props = useProps();

@@ -1,5 +1,4 @@
 import React from 'react';
-import { PublicKey } from '@solana/web3.js';
 import styled from 'styled-components';
 import { NavLink } from 'react-router-dom';
 
@@ -222,6 +221,8 @@ const Menu = styled.div``;
 
 interface Props {
   connect: () => Promise<void>;
+  logsVisibility: boolean;
+  toggleLogs: () => void;
 }
 
 // =============================================================================
@@ -229,7 +230,7 @@ interface Props {
 // =============================================================================
 
 const Sidebar = React.memo((props: Props) => {
-  const { connect } = props;
+  const { connect, logsVisibility, toggleLogs } = props;
   const [sandboxMenuOpen, setSandboxMenuOpen] = React.useState(false);
 
   const toggleSandboxMenu = () => {
@@ -256,7 +257,12 @@ const Sidebar = React.memo((props: Props) => {
           )}
         </Menu>
         <Menu>
-          <MenuContainer></MenuContainer>
+          <MenuContainer>
+            <ToggleLogsButton onClick={toggleLogs}>{`${
+              logsVisibility === true ? 'Hide' : 'Show'
+            } Logs`}</ToggleLogsButton>
+            <NetworkSelectButton className="mainnet"></NetworkSelectButton>
+          </MenuContainer>
         </Menu>
         <Link>
           <img src="/images/phantom-icon-purple.png" alt="Phantom" width="75" />
