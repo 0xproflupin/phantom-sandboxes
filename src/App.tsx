@@ -1,5 +1,6 @@
 import React from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import { BtcSandbox } from './sandboxes/btc-sandbox';
 import { SolSandbox } from './sandboxes/sol-sandbox';
 import { EthSandbox } from './sandboxes/eth-sandbox';
 import { MultiChainSandbox } from './sandboxes/multi-chain-sandbox';
@@ -19,6 +20,7 @@ function App() {
       <Routes>
         <Route index element={<SolSandbox />} />
         <Route path="/sol-sandbox" element={<SolSandbox />} />
+        <Route path="/btc-sandbox" element={<BtcSandbox />} />
         <Route path="/eth-sandbox" element={<EthSandbox />} />
         <Route path="/multi-chain-sandbox" element={<MultiChainSandbox />} />
         <Route path="/sol-adapter-sandbox" element={<SolAdapterSandbox />} />
