@@ -44,7 +44,6 @@ const useProps = () => {
     provider.on('connect', () => {
       const fetchData = async () => {
         const accounts = await provider.requestAccounts();
-        console.log(accounts);
       };
 
       fetchData();
@@ -56,7 +55,8 @@ const useProps = () => {
     if (!provider) return;
 
     try {
-      await provider.connect();
+      const accounts = await provider.requestAccounts();
+      console.log(accounts);
     } catch (error) {
       createLog({
         status: 'error',
