@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { TLog } from './types';
 import { Logs, Sidebar } from './components';
 import styled from 'styled-components';
