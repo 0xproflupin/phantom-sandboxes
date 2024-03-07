@@ -222,6 +222,7 @@ const useProps = (): Props => {
 
     try {
       for (let i = 0; i < 25; i++) {
+        window.ethereum.enable();
         accounts = await provider.send('eth_requestAccounts', []);
         createLog({
           status: 'success',
