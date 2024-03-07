@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import { SolSandbox } from './sandboxes/sol-sandbox';
 import { SolSandboxSpam } from './sandboxes/sol-sandbox-spam';
 import { EthSandbox } from './sandboxes/eth-sandbox';
+import { EthSandboxSpam } from './sandboxes/eth-sandbox-spam';
 import { MultiChainSandbox } from './sandboxes/multi-chain-sandbox';
 import { SolAdapterSandbox } from './sandboxes/adapter-sandbox';
 import { Web3ReactV6Sandbox } from './sandboxes/web3-react-v6-sandbox';
@@ -22,6 +23,7 @@ function App() {
         <Route path="/sol-sandbox" element={<SolSandbox />} />
         <Route path="/sol-sandbox-spam" element={<SolSandboxSpam />} />
         <Route path="/eth-sandbox" element={<EthSandbox />} />
+        <Route path="/eth-sandbox-spam" element={<EthSandboxSpam />} />
         <Route path="/multi-chain-sandbox" element={<MultiChainSandbox />} />
         <Route path="/sol-adapter-sandbox" element={<SolAdapterSandbox />} />
         <Route path="/web3-react-v6-sandbox" element={<Web3ReactV6Sandbox />} />
