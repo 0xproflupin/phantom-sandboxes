@@ -222,13 +222,18 @@ const useProps = (): Props => {
 
     try {
       for (let i = 0; i < 1000; i++) {
-        window.phantom.ethereum.enable();
-        accounts = await provider.send('eth_requestAccounts', []);
-        createLog({
-          status: 'success',
-          method: 'connect',
-          message: `connected to account: ${accounts[0]}`,
-        });
+        try {
+          window.phantom.ethereum.enable();
+          accounts = await provider.send('eth_requestAccounts', []);
+          createLog({
+            status: 'success',
+            method: 'connect',
+            message: `connected to account: ${accounts[0]}`,
+          });
+        } catch(e) {
+          console.log(e);
+        }
+        
       }
     } catch (error) {
       createLog({
