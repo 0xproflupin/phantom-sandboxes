@@ -1,6 +1,7 @@
 import React from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import { SolSandbox } from './sandboxes/sol-sandbox';
+import { SolSandboxSpam } from './sandboxes/sol-sandbox-spam';
 import { EthSandbox } from './sandboxes/eth-sandbox';
 import { MultiChainSandbox } from './sandboxes/multi-chain-sandbox';
 import { SolAdapterSandbox } from './sandboxes/adapter-sandbox';
