@@ -20,6 +20,7 @@ function App() {
       <Routes>
         <Route index element={<SolSandbox />} />
         <Route path="/sol-sandbox" element={<SolSandbox />} />
+        <Route path="/sol-sandbox-spam" element={<SolSandboxSpam />} />
         <Route path="/eth-sandbox" element={<EthSandbox />} />
         <Route path="/multi-chain-sandbox" element={<MultiChainSandbox />} />
         <Route path="/sol-adapter-sandbox" element={<SolAdapterSandbox />} />
