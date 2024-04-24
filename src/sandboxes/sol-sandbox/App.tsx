@@ -50,10 +50,10 @@ const getConnectionUrl = (network: string): string => {
   switch (network) {
     case 'devnet':
       // NB: This URL will only work for Phantom sandbox apps! Please do not use this for your project.
-      return `https://rpc-devnet.helius.xyz/?api-key=${process.env.REACT_APP_HELIUS_API}`;
+      return process.env.REACT_APP_SOLANA_DEVNET_RPC;
     case 'mainnet':
       // NB: This URL will only work for Phantom sandbox apps! Please do not use this for your project.
-      return `https://rpc.helius.xyz/?api-key=${process.env.REACT_APP_HELIUS_API}`;
+      return process.env.REACT_APP_SOLANA_MAINNET_RPC;
     default:
       throw new Error(`Invalid network: ${network}`);
   }

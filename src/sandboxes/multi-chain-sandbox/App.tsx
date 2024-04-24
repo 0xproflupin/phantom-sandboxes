@@ -46,7 +46,7 @@ const StyledApp = styled.div`
 // =============================================================================
 
 // NB: This URL will only work for Phantom sandbox apps! Please do not use this for your project. If you are running this locally we recommend using one of Solana's public RPC endpoints
-const solanaNetwork = `https://rpc-devnet.helius.xyz/?api-key=${process.env.REACT_APP_HELIUS_API}`;
+const solanaNetwork = process.env.REACT_APP_SOLANA_DEVNET_RPC;
 const connection = new Connection(solanaNetwork);
 const message = 'To avoid digital dognappers, sign below to authenticate with CryptoCorgis.';
 
