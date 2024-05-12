@@ -428,7 +428,7 @@ const StatelessApp = React.memo((props: Props) => {
         publicKey={publicKey}
         connectedMethods={connectedMethods}
         connect={handleConnect}
-        handleBrowseDeeplink={handleBrowseDeeplink}
+        openInPhantom={handleBrowseDeeplink}
         network={network}
         logsVisibility={logsVisibility}
         toggleLogs={toggleLogs}
