@@ -12,7 +12,6 @@ import bs58 from 'bs58';
 import {
   buildUrl,
   decryptPayload,
-  encryptPayload,
   setLocalStorage,
   removeLocalStorage,
   createTransferTransaction,
@@ -89,8 +88,8 @@ interface Props {
  * The fun stuff!
  */
 const useProps = (): Props => {
-  const [network, setNetwork] = useState('mainnet');
-  const [connection, setConnection] = useState(new Connection(getConnectionUrl(network)));
+  const [network] = useState('mainnet');
+  const [connection] = useState(new Connection(getConnectionUrl(network)));
   const [logs, setLogs] = useState<TLog[]>([]);
   const [logsVisibility, setLogsVisibility] = useState(false);
 
@@ -349,6 +348,13 @@ const useProps = (): Props => {
     window.location.href = buildUrl("signMessage", params);
   }, [session, sharedSecret, dappPubkey]);
 
+  const handleDeeplinkToBrowser = useCallback(async () => {
+    const url = new URL(window.location.href);
+    const encodedUrl = encodeURIComponent(`${url.protocol}//${url.hostname}`);
+    const encodedRef = encodeURIComponent(`${url.protocol}//${url.hostname}${url.pathname}`);
+    window.location.href = `https://phantom.app/ul/browse/${encodedUrl}?ref=${encodedRef}`;
+  }, []);
+
   const connectedMethods = useMemo(() => {
     return [
       {
@@ -368,6 +374,10 @@ const useProps = (): Props => {
         onClick: handleSignMessage,
       },
       {
+        name: 'Open in Phantom',
+        onClick: handleDeeplinkToBrowser,
+      },
+      {
         name: 'Disconnect',
         onClick: handleDisconnect,
       },
@@ -378,6 +388,7 @@ const useProps = (): Props => {
     handleSignTransaction,
     handleSignAllTransactions,
     handleSignMessage,
+    handleDeeplinkToBrowser,
   ]);
 
   return {
