@@ -348,7 +348,7 @@ const useProps = (): Props => {
     window.location.href = buildUrl("signMessage", params);
   }, [session, sharedSecret, dappPubkey]);
 
-  const handleDeeplinkToBrowser = useCallback(async () => {
+  const handleBrowseDeeplink = useCallback(async () => {
     const url = new URL(window.location.href);
     const encodedUrl = encodeURIComponent(`${url.protocol}//${url.hostname}`);
     const encodedRef = encodeURIComponent(`${url.protocol}//${url.hostname}${url.pathname}`);
@@ -375,7 +375,7 @@ const useProps = (): Props => {
       },
       {
         name: 'Open in Phantom',
-        onClick: handleDeeplinkToBrowser,
+        onClick: handleBrowseDeeplink,
       },
       {
         name: 'Disconnect',
@@ -388,7 +388,7 @@ const useProps = (): Props => {
     handleSignTransaction,
     handleSignAllTransactions,
     handleSignMessage,
-    handleDeeplinkToBrowser,
+    handleBrowseDeeplink,
   ]);
 
   return {
