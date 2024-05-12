@@ -252,6 +252,7 @@ const Sidebar = React.memo((props: Props) => {
               <NavigationLink to="/eth-sandbox">Ethereum Sandbox</NavigationLink>
               <NavigationLink to="/multi-chain-sandbox">Multi-Chain Sandbox</NavigationLink>
               <NavigationLink to="/sol-adapter-sandbox">Solana Adapter Sandbox</NavigationLink>
+              <NavigationLink to="/deeplinks-sandbox">Deeplinks Sandbox</NavigationLink>
               <NavigationLink to="/rainbowkit-sandbox">Rainbowkit Sandbox</NavigationLink>
               <NavigationLink to="/wagmi-sandbox">Wagmi Sandbox</NavigationLink>
               <NavigationLink to="/web3-react-v6-sandbox">Web3 React V6 Sandbox</NavigationLink>
