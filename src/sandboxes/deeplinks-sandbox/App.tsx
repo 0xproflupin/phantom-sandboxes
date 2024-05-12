@@ -72,6 +72,7 @@ interface Props {
   publicKey: PublicKey | null;
   connectedMethods: ConnectedMethods[];
   handleConnect: () => Promise<void>;
+  handleBrowseDeeplink: () => Promise<void>;
   logs: TLog[];
   clearLogs: () => void;
   toggleLogs: () => void;
@@ -395,6 +396,7 @@ const useProps = (): Props => {
     publicKey: phantomWalletPublicKey || null,
     connectedMethods,
     handleConnect,
+    handleBrowseDeeplink,
     logs,
     clearLogs,
     toggleLogs,
@@ -412,6 +414,7 @@ const StatelessApp = React.memo((props: Props) => {
     publicKey,
     connectedMethods,
     handleConnect,
+    handleBrowseDeeplink,
     logs,
     clearLogs,
     logsVisibility,
@@ -425,6 +428,7 @@ const StatelessApp = React.memo((props: Props) => {
         publicKey={publicKey}
         connectedMethods={connectedMethods}
         connect={handleConnect}
+        handleBrowseDeeplink={handleBrowseDeeplink}
         network={network}
         logsVisibility={logsVisibility}
         toggleLogs={toggleLogs}

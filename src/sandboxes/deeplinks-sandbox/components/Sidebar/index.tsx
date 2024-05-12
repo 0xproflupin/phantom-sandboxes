@@ -225,6 +225,7 @@ interface Props {
   publicKey?: PublicKey;
   connectedMethods: ConnectedMethods[];
   connect: () => Promise<void>;
+  openInPhantom: () => Promise<void>;
   network: string;
   logsVisibility: boolean;
   toggleLogs: () => void;
@@ -235,7 +236,7 @@ interface Props {
 // =============================================================================
 
 const Sidebar = React.memo((props: Props) => {
-  const { publicKey, connectedMethods, connect, network, logsVisibility, toggleLogs } = props;
+  const { publicKey, connectedMethods, connect, openInPhantom, network, logsVisibility, toggleLogs } = props;
   const [sandboxMenuOpen, setSandboxMenuOpen] = React.useState(false);
 
   const toggleSandboxMenu = () => {
@@ -294,7 +295,10 @@ const Sidebar = React.memo((props: Props) => {
           </>
         ) : (
           // not connected
-          <Button onClick={connect}>Connect to Phantom</Button>
+          <>
+            <Button onClick={connect}>Connect to Phantom</Button>
+            <Button onClick={openInPhantom}>Open In Phantom</Button>
+          </>
         )}
       </Body>
       {/* 😊 💕  */}
