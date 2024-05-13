@@ -189,11 +189,13 @@ const useProps = (): Props => {
   
           createLog({
             status: 'info',
+            method: 'connect',
             message: JSON.stringify(connectData, null, 2),
           });
         } catch (error) {
           createLog({
             status: 'error',
+            method: 'connect',
             message: JSON.stringify(error, null, 2),
           });
         }
@@ -203,6 +205,7 @@ const useProps = (): Props => {
 
         createLog({
           status: 'info',
+          method: 'disconnect',
           message: "Disconnected!",
         });
       } else if (path.startsWith("onSignAndSendTransaction")) {
@@ -215,11 +218,13 @@ const useProps = (): Props => {
   
           createLog({
             status: 'info',
+            method: 'signAndSendTransaction',
             message: JSON.stringify(signAndSendTransactionData, null, 2),
           });
         } catch (error) {
           createLog({
             status: 'error',
+            method: 'signAndSendTransaction',
             message: JSON.stringify(error, null, 2),
           });
         }
@@ -233,11 +238,13 @@ const useProps = (): Props => {
   
           createLog({
             status: 'info',
+            method: 'signAllTransactions',
             message: JSON.stringify(signAllTransactionsData, null, 2),
           });
         } catch (error) {
           createLog({
             status: 'error',
+            method: 'signAllTransactions',v
             message: JSON.stringify(error, null, 2),
           });
         }
@@ -251,11 +258,13 @@ const useProps = (): Props => {
   
           createLog({
             status: 'info',
+            method: 'signTransaction',
             message: JSON.stringify(signTransactionData, null, 2),
           });
         } catch (error) {
           createLog({
             status: 'error',
+            method: 'signTransaction',
             message: JSON.stringify(error, null, 2),
           });
         }
@@ -269,11 +278,13 @@ const useProps = (): Props => {
   
           createLog({
             status: 'info',
+            method: 'signMessage',
             message: JSON.stringify(signMessageData, null, 2),
           });
         } catch (error) {
           createLog({
             status: 'error',
+            method: 'signMessage',
             message: JSON.stringify(error, null, 2),
           });
         }
