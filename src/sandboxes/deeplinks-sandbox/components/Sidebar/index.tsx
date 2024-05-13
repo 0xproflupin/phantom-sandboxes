@@ -1,12 +1,14 @@
 import React from 'react';
+import { PublicKey } from '@solana/web3.js';
 import styled from 'styled-components';
 import { NavLink } from 'react-router-dom';
 
-import { DARK_GRAY, GRAY, PURPLE, REACT_GRAY, WHITE } from '../../constants';
+import { GRAY, REACT_GRAY, PURPLE, WHITE, DARK_GRAY } from '../../constants';
+
 import { hexToRGB } from '../../utils';
+
 import Button from '../Button';
-import { ConnectedAccounts, ConnectedMethods } from '../../App';
-import { SupportedChainIcons, SupportedChainNames, SupportedEVMChainIds } from '../../types';
+import { ConnectedMethods } from '../../App';
 
 // =============================================================================
 // Styled Components
@@ -61,16 +63,6 @@ const Link = styled.a.attrs({
 
 const Pre = styled.pre`
   margin-bottom: 5px;
-  margin-right: auto;
-`;
-
-const AccountRow = styled.div`
-  display: flex;
-  margin-bottom: 8px;
-
-  :last-of-type {
-    margin-bottom: 0;
-  }
 `;
 
 const Badge = styled.div`
@@ -80,7 +72,7 @@ const Badge = styled.div`
   color: ${PURPLE};
   background-color: ${hexToRGB(PURPLE, 0.2)};
   font-size: 14px;
-  border-radius: 0 6px 6px 0;
+  border-radius: 6px;
   @media (max-width: 400px) {
     width: 280px;
     white-space: nowrap;
@@ -93,12 +85,10 @@ const Badge = styled.div`
     overflow: hidden;
     text-overflow: ellipsis;
   }
-
   ::selection {
     color: ${WHITE};
     background-color: ${hexToRGB(PURPLE, 0.5)};
   }
-
   ::-moz-selection {
     color: ${WHITE};
     background-color: ${hexToRGB(PURPLE, 0.5)};
@@ -114,49 +104,29 @@ const Divider = styled.div`
 const Tag = styled.p`
   text-align: center;
   color: ${GRAY};
-
   a {
     color: ${PURPLE};
     text-decoration: none;
-
     ::selection {
       color: ${WHITE};
       background-color: ${hexToRGB(PURPLE, 0.5)};
     }
-
     ::-moz-selection {
       color: ${WHITE};
       background-color: ${hexToRGB(PURPLE, 0.5)};
     }
   }
-
   @media (max-width: 320px) {
     font-size: 14px;
   }
-
   ::selection {
     color: ${WHITE};
     background-color: ${hexToRGB(PURPLE, 0.5)};
   }
-
   ::-moz-selection {
     color: ${WHITE};
     background-color: ${hexToRGB(PURPLE, 0.5)};
   }
-`;
-
-const ChainIcon = styled.img`
-  height: ${(props) => props.height};
-  width: ${(props) => props.height};
-  border-radius: 6px 0 0 6px;
-`;
-
-const ChainHeader = styled.div`
-  display: flex;
-  width: 100%;
-  justify-content: flex-start;
-  align-items: center;
-  margin: 5px 0 10px;
 `;
 
 const NavigationLink = styled(NavLink)`
@@ -211,8 +181,8 @@ const NetworkSelectButton = styled.button`
 `;
 
 const MenuButton = styled.button`
-  margin-bottom: 30px;
-  padding: 8px 12px;
+  margin-bottom: 10px;
+  padding: 8px 10px;
   width: 200px;
   background-color: ${PURPLE};
   color: ${WHITE};
@@ -252,10 +222,11 @@ const Menu = styled.div``;
 // =============================================================================
 
 interface Props {
+  publicKey?: PublicKey;
   connectedMethods: ConnectedMethods[];
-  connectedEthereumChainId: SupportedEVMChainIds | null;
-  connectedAccounts: ConnectedAccounts;
   connect: () => Promise<void>;
+  openInPhantom: () => Promise<void>;
+  network: string;
   logsVisibility: boolean;
   toggleLogs: () => void;
 }
@@ -263,18 +234,20 @@ interface Props {
 // =============================================================================
 // Main Component
 // =============================================================================
+
 const Sidebar = React.memo((props: Props) => {
-  const { connectedAccounts, connectedMethods, connect, logsVisibility, toggleLogs } = props;
+  const { publicKey, connectedMethods, connect, openInPhantom, network, logsVisibility, toggleLogs } = props;
   const [sandboxMenuOpen, setSandboxMenuOpen] = React.useState(false);
 
   const toggleSandboxMenu = () => {
     setSandboxMenuOpen(!sandboxMenuOpen);
   };
+
   return (
     <Main>
       <Body>
         <Menu>
-          <MenuButton onClick={toggleSandboxMenu}>Multichain Sandbox {sandboxMenuOpen ? '-' : '\u2630'}</MenuButton>
+          <MenuButton onClick={toggleSandboxMenu}>Deeplinks Sandbox {sandboxMenuOpen ? '-' : '\u2630'}</MenuButton>
           {sandboxMenuOpen && (
             <MenuContainer>
               <NavigationLink to="/sol-sandbox">Solana Sandbox</NavigationLink>
@@ -295,92 +268,37 @@ const Sidebar = React.memo((props: Props) => {
             <ToggleLogsButton onClick={toggleLogs}>{`${
               logsVisibility === true ? 'Hide' : 'Show'
             } Logs`}</ToggleLogsButton>
-            <NetworkSelectButton className="selected">Ethereum Goerli Testnet</NetworkSelectButton>
-            <NetworkSelectButton className="selected">Polygon Mainnet</NetworkSelectButton>
-            <NetworkSelectButton className="selected">Solana Devnet</NetworkSelectButton>
+            <NetworkSelectButton
+              onClick={() => null}
+              className={network === 'mainnet' ? 'selected' : ''}
+            >
+              Mainnet
+            </NetworkSelectButton>
           </MenuContainer>
         </Menu>
         <Link>
           <img src="/images/phantom-icon-purple.png" alt="Phantom" width="75" />
         </Link>
-        {connectedAccounts?.solana ? (
+        {publicKey ? (
           // connected
           <>
             <div>
               <Pre>Connected as</Pre>
-              <AccountRow>
-                <ChainIcon src={SupportedChainIcons.Ethereum} height="36px" />
-                <Badge>{connectedAccounts?.ethereum}</Badge>
-              </AccountRow>
-              <AccountRow>
-                <ChainIcon src={SupportedChainIcons.Polygon} height="36px" />
-                <Badge>{connectedAccounts?.ethereum}</Badge>
-              </AccountRow>
-              <AccountRow>
-                <ChainIcon src={SupportedChainIcons.Solana} height="36px" />
-                <Badge>{connectedAccounts?.solana?.toBase58()}</Badge>
-              </AccountRow>
+              <Badge>{publicKey.toBase58()}</Badge>
               <Divider />
             </div>
-            <ChainHeader>
-              <ChainIcon
-                src={SupportedChainIcons.Ethereum}
-                height="16px"
-                style={{ marginRight: '6px', borderRadius: '6px' }}
-              />
-              <Tag>{SupportedChainNames.EthereumGoerli}</Tag>
-            </ChainHeader>
-            {connectedMethods
-              .filter((method) => method.chain === 'ethereum')
-              .map((method, i) => (
-                <Button
-                  data-test-id={`ethereum-goerli-${method.name}`}
-                  key={`${method.name}-${i}`}
-                  onClick={() => method.onClick(SupportedEVMChainIds.EthereumGoerli)}
-                >
-                  {method.name}
-                </Button>
-              ))}
-            <ChainHeader>
-              <ChainIcon
-                src={SupportedChainIcons.Polygon}
-                height="16px"
-                style={{ marginRight: '6px', borderRadius: '6px' }}
-              />
-              <Tag>{SupportedChainNames.PolygonMainnet}</Tag>
-            </ChainHeader>
-            {connectedMethods
-              .filter((method) => method.chain === 'ethereum')
-              .map((method, i) => (
-                <Button
-                  data-test-id={`polygon-mainnet-${method.name}`}
-                  key={`${method.name}-${i}`}
-                  onClick={() => method.onClick(SupportedEVMChainIds.PolygonMainnet)}
-                >
-                  {method.name}
-                </Button>
-              ))}
-            <ChainHeader>
-              <ChainIcon
-                src={SupportedChainIcons.Solana}
-                height="16px"
-                style={{ marginRight: '6px', borderRadius: '6px' }}
-              />
-              <Tag>{SupportedChainNames.SolanaDevnet}</Tag>
-            </ChainHeader>
-            {connectedMethods
-              .filter((method) => method.chain === 'solana')
-              .map((method, i) => (
-                <Button data-test-id={`solana-${method.name}`} key={`${method.name}-${i}`} onClick={method.onClick}>
-                  {method.name}
-                </Button>
-              ))}
+            {connectedMethods.map((method, i) => (
+              <Button key={`${method.name}-${i}`} onClick={method.onClick}>
+                {method.name}
+              </Button>
+            ))}
           </>
         ) : (
           // not connected
-          <Button data-testid="connect-to-phantom" onClick={connect} style={{ marginTop: '15px' }}>
-            Connect to Phantom
-          </Button>
+          <>
+            <Button onClick={connect}>Connect to Phantom</Button>
+            <Button onClick={openInPhantom}>Open In Phantom</Button>
+          </>
         )}
       </Body>
       {/* 😊 💕  */}
