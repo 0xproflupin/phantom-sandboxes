@@ -244,7 +244,7 @@ const useProps = (): Props => {
         } catch (error) {
           createLog({
             status: 'error',
-            method: 'signAllTransactions',v
+            method: 'signAllTransactions',
             message: JSON.stringify(error, null, 2),
           });
         }
