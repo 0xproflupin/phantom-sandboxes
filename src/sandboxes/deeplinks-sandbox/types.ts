@@ -1,4 +1,4 @@
-import { PublicKey } from "@solana/web3.js";
+import { PublicKey } from '@solana/web3.js';
 
 type PhantomEvent = 'connect' | 'disconnect' | 'accountChanged';
 
@@ -17,7 +17,7 @@ export interface TLog {
   status: Status;
   method?: PhantomRequestMethod | Extract<PhantomEvent, 'accountChanged'>;
   message: string;
-  confirmation?: {signature: string, link: string};
+  confirmation?: { signature: string; link: string };
   messageTwo?: string;
 }
 
@@ -35,4 +35,10 @@ export interface DeeplinkState {
   phantomWalletPublicKey?: PublicKey;
   dappPubkey?: Uint8Array;
   dappSecretkey?: Uint8Array;
+}
+
+export enum Platform {
+  iOS = 'iOS',
+  Android = 'Android',
+  Other = 'Other',
 }
