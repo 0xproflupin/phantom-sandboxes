@@ -6,7 +6,7 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import styled from 'styled-components';
 import { Connection, PublicKey } from '@solana/web3.js';
-import nacl from "tweetnacl";
+import nacl from 'tweetnacl';
 import bs58 from 'bs58';
 
 import {
@@ -19,9 +19,10 @@ import {
   signAndSendTransaction,
   signAllTransactions,
   signMessage,
+  getMobileOS,
 } from './utils';
 
-import { DeeplinkState, TLog } from './types';
+import { DeeplinkState, Platform, TLog } from './types';
 
 import { Logs, Sidebar } from './components';
 
@@ -93,6 +94,7 @@ const useProps = (): Props => {
   const [connection] = useState(new Connection(getConnectionUrl(network)));
   const [logs, setLogs] = useState<TLog[]>([]);
   const [logsVisibility, setLogsVisibility] = useState(false);
+  const [platform, setPlatform] = useState<Platform>(Platform.Other);
 
   const [dappPubkey, setDappPubkey] = useState<Uint8Array | null>(() => {
     const pubkey = localStorage.getItem('dappPubkey');
@@ -116,28 +118,26 @@ const useProps = (): Props => {
     (deepLinkState: DeeplinkState) => {
       if (deepLinkState.sharedSecret !== undefined) setSharedSecret(deepLinkState.sharedSecret);
       if (deepLinkState.session !== undefined) setSession(deepLinkState.session);
-      if (deepLinkState.phantomWalletPublicKey !== undefined) setPhantomWalletPublicKey(deepLinkState.phantomWalletPublicKey);
+      if (deepLinkState.phantomWalletPublicKey !== undefined)
+        setPhantomWalletPublicKey(deepLinkState.phantomWalletPublicKey);
       if (deepLinkState.dappPubkey !== undefined) setDappPubkey(deepLinkState.dappPubkey);
       if (deepLinkState.dappSecretkey !== undefined) setDappSecretkey(deepLinkState.dappSecretkey);
     },
     [setSharedSecret, setSession, setPhantomWalletPublicKey, setDappPubkey, setDappSecretkey]
   );
 
-  const resetDeeplinkState = useCallback(
-    () => {
-      setSharedSecret(null);
-      setSession(null);
-      setPhantomWalletPublicKey(null);
-      setDappPubkey(null);
-      setDappSecretkey(null);
-      setLogs([]);
-    },
-    [setSharedSecret, setSession, setPhantomWalletPublicKey, setDappPubkey, setDappSecretkey]
-  );
+  const resetDeeplinkState = useCallback(() => {
+    setSharedSecret(null);
+    setSession(null);
+    setPhantomWalletPublicKey(null);
+    setDappPubkey(null);
+    setDappSecretkey(null);
+    setLogs([]);
+  }, [setSharedSecret, setSession, setPhantomWalletPublicKey, setDappPubkey, setDappSecretkey]);
 
   const createLog = useCallback(
     (log: TLog) => {
-      return setLogs((logs) => [...logs, log]);;
+      return setLogs((logs) => [...logs, log]);
     },
     [setLogs]
   );
@@ -151,10 +151,14 @@ const useProps = (): Props => {
   };
 
   useEffect(() => {
+    setPlatform(getMobileOS());
+  }, []);
+
+  useEffect(() => {
     const handleDeepLink = () => {
       const url = new URL(window.location.href);
       const params = url.searchParams;
-      if (params.get("errorCode")) {
+      if (params.get('errorCode')) {
         createLog({
           status: 'error',
           message: JSON.stringify(Object.fromEntries([...params]), null, 2),
@@ -163,30 +167,26 @@ const useProps = (): Props => {
       }
 
       const path = url.hash.substring(1);
-      if (path.startsWith("onConnect")) {
+      if (path.startsWith('onConnect')) {
         const sharedSecretDapp = nacl.box.before(
-          bs58.decode(params.get("phantom_encryption_public_key")),
+          bs58.decode(params.get('phantom_encryption_public_key')),
           dappSecretkey
         );
 
         try {
-          const connectData = decryptPayload(
-            params.get("data"),
-            params.get("nonce"),
-            sharedSecretDapp
-          );
-  
+          const connectData = decryptPayload(params.get('data'), params.get('nonce'), sharedSecretDapp);
+
           setLocalStorage({
             sharedSecret: bs58.encode(sharedSecretDapp),
             session: connectData.session,
-            phantomWalletPublicKey: connectData.public_key
+            phantomWalletPublicKey: connectData.public_key,
           });
           setDeeplinkState({
             sharedSecret: sharedSecretDapp,
             session: connectData.session,
             phantomWalletPublicKey: new PublicKey(connectData.public_key),
           });
-  
+
           createLog({
             status: 'info',
             method: 'connect',
@@ -199,23 +199,19 @@ const useProps = (): Props => {
             message: JSON.stringify(error, null, 2),
           });
         }
-      } else if (path.startsWith("onDisconnect")) {
+      } else if (path.startsWith('onDisconnect')) {
         removeLocalStorage();
         resetDeeplinkState();
 
         createLog({
           status: 'info',
           method: 'disconnect',
-          message: "Disconnected!",
+          message: 'Disconnected!',
         });
-      } else if (path.startsWith("onSignAndSendTransaction")) {
+      } else if (path.startsWith('onSignAndSendTransaction')) {
         try {
-          const signAndSendTransactionData = decryptPayload(
-            params.get("data"),
-            params.get("nonce"),
-            sharedSecret
-          );
-  
+          const signAndSendTransactionData = decryptPayload(params.get('data'), params.get('nonce'), sharedSecret);
+
           createLog({
             status: 'info',
             method: 'signAndSendTransaction',
@@ -228,14 +224,10 @@ const useProps = (): Props => {
             message: JSON.stringify(error, null, 2),
           });
         }
-      } else if (path.startsWith("onSignAllTransactions")) {
+      } else if (path.startsWith('onSignAllTransactions')) {
         try {
-          const signAllTransactionsData = decryptPayload(
-            params.get("data"),
-            params.get("nonce"),
-            sharedSecret
-          );
-  
+          const signAllTransactionsData = decryptPayload(params.get('data'), params.get('nonce'), sharedSecret);
+
           createLog({
             status: 'info',
             method: 'signAllTransactions',
@@ -248,14 +240,10 @@ const useProps = (): Props => {
             message: JSON.stringify(error, null, 2),
           });
         }
-      } else if (path.startsWith("onSignTransaction")) {
+      } else if (path.startsWith('onSignTransaction')) {
         try {
-          const signTransactionData = decryptPayload(
-            params.get("data"),
-            params.get("nonce"),
-            sharedSecret
-          );
-  
+          const signTransactionData = decryptPayload(params.get('data'), params.get('nonce'), sharedSecret);
+
           createLog({
             status: 'info',
             method: 'signTransaction',
@@ -268,14 +256,10 @@ const useProps = (): Props => {
             message: JSON.stringify(error, null, 2),
           });
         }
-      } else if (path.startsWith("onSignMessage")) {
+      } else if (path.startsWith('onSignMessage')) {
         try {
-          const signMessageData = decryptPayload(
-            params.get("data"),
-            params.get("nonce"),
-            sharedSecret
-          );
-  
+          const signMessageData = decryptPayload(params.get('data'), params.get('nonce'), sharedSecret);
+
           createLog({
             status: 'info',
             method: 'signMessage',
@@ -292,7 +276,7 @@ const useProps = (): Props => {
     };
 
     handleDeepLink();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [createLog, resetDeeplinkState, setDeeplinkState]);
 
   const handleConnect = useCallback(async () => {
@@ -301,13 +285,13 @@ const useProps = (): Props => {
     setDeeplinkState({
       dappPubkey: kp.publicKey,
       dappSecretkey: kp.secretKey,
-    })
+    });
     const dappEncryptionPubkey = bs58.encode(kp.publicKey);
-    setLocalStorage({dappPubkey: dappEncryptionPubkey, dappSecretkey: bs58.encode(kp.secretKey)});
+    setLocalStorage({ dappPubkey: dappEncryptionPubkey, dappSecretkey: bs58.encode(kp.secretKey) });
     const params = new URLSearchParams({
       dapp_encryption_public_key: dappEncryptionPubkey,
-      cluster: "mainnet-beta",
-      app_url: "https://phantom.app",
+      cluster: 'mainnet-beta',
+      app_url: 'https://phantom.app',
       redirect_link: `${url.protocol}//${url.hostname}${url.pathname}#onConnect`,
     });
 
@@ -316,8 +300,8 @@ const useProps = (): Props => {
       message: 'Connecting..',
     });
 
-    window.location.href = buildUrl("connect", params);
-  }, [createLog, setDeeplinkState]);
+    window.location.href = buildUrl('connect', params, platform);
+  }, [createLog, platform, setDeeplinkState]);
 
   const handleDisconnect = useCallback(async () => {
     const url = new URL(window.location.href);
@@ -327,7 +311,7 @@ const useProps = (): Props => {
 
     createLog({
       status: 'info',
-      message: "Disconnected!",
+      message: 'Disconnected!',
     });
     window.location.href = `${url.protocol}//${url.hostname}${url.pathname}`;
   }, [resetDeeplinkState, clearLogs, createLog]);
@@ -335,37 +319,40 @@ const useProps = (): Props => {
   const handleSignAndSendTransaction = useCallback(async () => {
     const transaction = await createTransferTransaction(phantomWalletPublicKey, connection, createLog);
     const params = signAndSendTransaction(transaction, session, sharedSecret, dappPubkey);
-    window.location.href = buildUrl("signAndSendTransaction", params);
-  }, [phantomWalletPublicKey, connection, createLog, session, sharedSecret, dappPubkey]);
+    window.location.href = buildUrl('signAndSendTransaction', params, platform);
+  }, [phantomWalletPublicKey, connection, createLog, session, sharedSecret, dappPubkey, platform]);
 
   const handleSignAllTransactions = useCallback(async () => {
     const transactions = await Promise.all([
       createTransferTransaction(phantomWalletPublicKey, connection, createLog, 100),
       createTransferTransaction(phantomWalletPublicKey, connection, createLog, 101),
-      createTransferTransaction(phantomWalletPublicKey, connection, createLog, 102)
+      createTransferTransaction(phantomWalletPublicKey, connection, createLog, 102),
     ]);
     const params = signAllTransactions(transactions, session, sharedSecret, dappPubkey);
-    window.location.href = buildUrl("signAllTransactions", params);
-  }, [phantomWalletPublicKey, connection, createLog, session, sharedSecret, dappPubkey]);
+    window.location.href = buildUrl('signAllTransactions', params, platform);
+  }, [phantomWalletPublicKey, connection, createLog, session, sharedSecret, dappPubkey, platform]);
 
   const handleSignTransaction = useCallback(async () => {
     const transaction = await createTransferTransaction(phantomWalletPublicKey, connection, createLog);
     const params = signTransaction(transaction, session, sharedSecret, dappPubkey);
-    window.location.href = buildUrl("signTransaction", params);
-  }, [phantomWalletPublicKey, connection, createLog, session, sharedSecret, dappPubkey]);
+    window.location.href = buildUrl('signTransaction', params, platform);
+  }, [phantomWalletPublicKey, connection, createLog, session, sharedSecret, dappPubkey, platform]);
 
   const handleSignMessage = useCallback(async () => {
-    const message = "To avoid digital dognappers, sign below to authenticate with CryptoCorgis.";
+    const message = 'To avoid digital dognappers, sign below to authenticate with CryptoCorgis.';
     const params = signMessage(message, session, sharedSecret, dappPubkey);
-    window.location.href = buildUrl("signMessage", params);
-  }, [session, sharedSecret, dappPubkey]);
+    window.location.href = buildUrl('signMessage', params, platform);
+  }, [session, sharedSecret, dappPubkey, platform]);
 
   const handleBrowseDeeplink = useCallback(async () => {
     const url = new URL(window.location.href);
     const encodedUrl = encodeURIComponent(`${url.protocol}//${url.hostname}`);
     const encodedRef = encodeURIComponent(`${url.protocol}//${url.hostname}${url.pathname}`);
-    window.location.href = `https://phantom.app/ul/browse/${encodedUrl}?ref=${encodedRef}`;
-  }, []);
+    window.location.href =
+      platform === Platform.iOS
+        ? `phantom://browse/${encodedUrl}?ref=${encodedRef}`
+        : `https://phantom.app/ul/browse/${encodedUrl}?ref=${encodedRef}`;
+  }, [platform]);
 
   const connectedMethods = useMemo(() => {
     return [
