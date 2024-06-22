@@ -20,6 +20,7 @@ import {
   signAllTransactions,
   signMessage,
   getMobileOS,
+  signAndSendAllTransactions,
 } from './utils';
 
 import { DeeplinkState, Platform, TLog } from './types';
@@ -208,6 +209,22 @@ const useProps = (): Props => {
           method: 'disconnect',
           message: 'Disconnected!',
         });
+      } else if (path.startsWith('onSignAndSendAllTransactions')) {
+        try {
+          const signAndSendAllTransactionsData = decryptPayload(params.get('data'), params.get('nonce'), sharedSecret);
+
+          createLog({
+            status: 'info',
+            method: 'signAndSendAllTransactions',
+            message: JSON.stringify(signAndSendAllTransactionsData, null, 2),
+          });
+        } catch (error) {
+          createLog({
+            status: 'error',
+            method: 'signAndSendAllTransactions',
+            message: JSON.stringify(error, null, 2),
+          });
+        }
       } else if (path.startsWith('onSignAndSendTransaction')) {
         try {
           const signAndSendTransactionData = decryptPayload(params.get('data'), params.get('nonce'), sharedSecret);
@@ -316,6 +333,16 @@ const useProps = (): Props => {
     window.location.href = `${url.protocol}//${url.hostname}${url.pathname}`;
   }, [resetDeeplinkState, clearLogs, createLog]);
 
+  const handleSignAndSendAllTransactions = useCallback(async () => {
+    const transactions = await Promise.all([
+      createTransferTransaction(phantomWalletPublicKey, connection, createLog, 100),
+      createTransferTransaction(phantomWalletPublicKey, connection, createLog, 101),
+      createTransferTransaction(phantomWalletPublicKey, connection, createLog, 102),
+    ]);
+    const params = signAndSendAllTransactions(transactions, session, sharedSecret, dappPubkey);
+    window.location.href = buildUrl('signAndSendAllTransactions', params, platform);
+  }, [phantomWalletPublicKey, connection, createLog, session, sharedSecret, dappPubkey, platform]);
+
   const handleSignAndSendTransaction = useCallback(async () => {
     const transaction = await createTransferTransaction(phantomWalletPublicKey, connection, createLog);
     const params = signAndSendTransaction(transaction, session, sharedSecret, dappPubkey);
@@ -357,6 +384,10 @@ const useProps = (): Props => {
   const connectedMethods = useMemo(() => {
     return [
       {
+        name: 'Sign and Send All Transactions',
+        onClick: handleSignAndSendAllTransactions,
+      },
+      {
         name: 'Sign and Send Transaction',
         onClick: handleSignAndSendTransaction,
       },
@@ -383,6 +414,7 @@ const useProps = (): Props => {
     ];
   }, [
     handleDisconnect,
+    handleSignAndSendAllTransactions,
     handleSignAndSendTransaction,
     handleSignTransaction,
     handleSignAllTransactions,
