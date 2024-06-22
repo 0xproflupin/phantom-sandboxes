@@ -7,6 +7,7 @@ type PhantomRequestMethod =
   | 'disconnect'
   | 'signAndSendTransaction'
   | 'signAndSendTransactionV0'
+  | 'signAndSendAllTransactions'
   | 'signTransaction'
   | 'signAllTransactions'
   | 'signMessage';

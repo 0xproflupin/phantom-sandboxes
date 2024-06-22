@@ -5,6 +5,7 @@ export { default as pollSignatureStatus } from './pollSignatureStatus';
 export { buildUrl, decryptPayload, encryptPayload, setLocalStorage, removeLocalStorage } from './deeplinksUtils';
 export { default as signTransaction } from './signTransaction';
 export { default as signAndSendTransaction } from './signAndSendTransaction';
+export { default as signAndSendAllTransactions } from './signAndSendAllTransactions';
 export { default as signAllTransactions } from './signAllTransactions';
 export { default as signMessage } from './signMessage';
 export { getMobileOS } from './detectPlatform';
