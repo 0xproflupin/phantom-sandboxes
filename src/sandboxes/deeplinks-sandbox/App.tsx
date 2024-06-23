@@ -21,6 +21,8 @@ import {
   signMessage,
   getMobileOS,
   signAndSendAllTransactions,
+  createSignInErrorData,
+  createSignInData,
 } from './utils';
 
 import { DeeplinkState, Platform, TLog } from './types';
@@ -75,6 +77,7 @@ interface Props {
   connectedMethods: ConnectedMethods[];
   handleConnect: () => Promise<void>;
   handleBrowseDeeplink: () => Promise<void>;
+  handleSignIn: () => Promise<void>;
   logs: TLog[];
   clearLogs: () => void;
   toggleLogs: () => void;
@@ -200,6 +203,37 @@ const useProps = (): Props => {
             message: JSON.stringify(error, null, 2),
           });
         }
+      } else if (path.startsWith('onSignIn')) {
+        const sharedSecretDapp = nacl.box.before(
+          bs58.decode(params.get('phantom_encryption_public_key')),
+          dappSecretkey
+        );
+
+        try {
+          const signInData = decryptPayload(params.get('data'), params.get('nonce'), sharedSecretDapp);
+          setLocalStorage({
+            sharedSecret: bs58.encode(sharedSecretDapp),
+            session: signInData.session,
+            phantomWalletPublicKey: signInData.address,
+          });
+          setDeeplinkState({
+            sharedSecret: sharedSecretDapp,
+            session: signInData.session,
+            phantomWalletPublicKey: new PublicKey(signInData.address),
+          });
+
+          createLog({
+            status: 'info',
+            method: 'signIn',
+            message: JSON.stringify(signInData, null, 2),
+          });
+        } catch (error) {
+          createLog({
+            status: 'error',
+            method: 'signIn',
+            message: JSON.stringify(error, null, 2),
+          });
+        }
       } else if (path.startsWith('onDisconnect')) {
         removeLocalStorage();
         resetDeeplinkState();
@@ -320,6 +354,58 @@ const useProps = (): Props => {
     window.location.href = buildUrl('connect', params, platform);
   }, [createLog, platform, setDeeplinkState]);
 
+  const handleSignIn = useCallback(async () => {
+    const url = new URL(window.location.href);
+    const kp = nacl.box.keyPair();
+    setDeeplinkState({
+      dappPubkey: kp.publicKey,
+      dappSecretkey: kp.secretKey,
+    });
+    const dappEncryptionPubkey = bs58.encode(kp.publicKey);
+    setLocalStorage({ dappPubkey: dappEncryptionPubkey, dappSecretkey: bs58.encode(kp.secretKey) });
+    const signInData = await createSignInData();
+    const params = new URLSearchParams({
+      dapp_encryption_public_key: dappEncryptionPubkey,
+      cluster: 'mainnet-beta',
+      app_url: 'https://phantom.app',
+      redirect_link: `${url.protocol}//${url.hostname}${url.pathname}#onSignIn`,
+      payload: bs58.encode(Buffer.from(JSON.stringify(signInData))),
+    });
+
+    createLog({
+      status: 'info',
+      message: 'Signing In..',
+    });
+
+    window.location.href = buildUrl('signIn', params, platform);
+  }, [createLog, platform, setDeeplinkState]);
+
+  const handleSignInError = useCallback(async () => {
+    const url = new URL(window.location.href);
+    const kp = nacl.box.keyPair();
+    setDeeplinkState({
+      dappPubkey: kp.publicKey,
+      dappSecretkey: kp.secretKey,
+    });
+    const dappEncryptionPubkey = bs58.encode(kp.publicKey);
+    setLocalStorage({ dappPubkey: dappEncryptionPubkey, dappSecretkey: bs58.encode(kp.secretKey) });
+    const signInErrorData = await createSignInErrorData();
+    const params = new URLSearchParams({
+      dapp_encryption_public_key: dappEncryptionPubkey,
+      cluster: 'mainnet-beta',
+      app_url: 'https://phantom.app',
+      redirect_link: `${url.protocol}//${url.hostname}${url.pathname}#onSignIn`,
+      payload: bs58.encode(Buffer.from(JSON.stringify(signInErrorData))),
+    });
+
+    createLog({
+      status: 'info',
+      message: 'Signing In..',
+    });
+
+    window.location.href = buildUrl('signIn', params, platform);
+  }, [createLog, platform, setDeeplinkState]);
+
   const handleDisconnect = useCallback(async () => {
     const url = new URL(window.location.href);
     resetDeeplinkState();
@@ -404,6 +490,14 @@ const useProps = (): Props => {
         onClick: handleSignMessage,
       },
       {
+        name: 'Sign In',
+        onClick: handleSignIn,
+      },
+      {
+        name: 'Sign In Error',
+        onClick: handleSignInError,
+      },
+      {
         name: 'Open in Phantom',
         onClick: handleBrowseDeeplink,
       },
@@ -419,6 +513,8 @@ const useProps = (): Props => {
     handleSignTransaction,
     handleSignAllTransactions,
     handleSignMessage,
+    handleSignIn,
+    handleSignInError,
     handleBrowseDeeplink,
   ]);
 
@@ -427,6 +523,7 @@ const useProps = (): Props => {
     connectedMethods,
     handleConnect,
     handleBrowseDeeplink,
+    handleSignIn,
     logs,
     clearLogs,
     toggleLogs,
@@ -445,6 +542,7 @@ const StatelessApp = React.memo((props: Props) => {
     connectedMethods,
     handleConnect,
     handleBrowseDeeplink,
+    handleSignIn,
     logs,
     clearLogs,
     logsVisibility,
@@ -459,6 +557,7 @@ const StatelessApp = React.memo((props: Props) => {
         connectedMethods={connectedMethods}
         connect={handleConnect}
         openInPhantom={handleBrowseDeeplink}
+        signIn={handleSignIn}
         network={network}
         logsVisibility={logsVisibility}
         toggleLogs={toggleLogs}

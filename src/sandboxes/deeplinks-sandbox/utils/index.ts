@@ -1,5 +1,6 @@
 export { default as createTransferTransaction } from './createTransferTransaction';
 export { default as createTransferTransactionV0 } from './createTransferTransactionV0';
+export { createSignInData, createSignInErrorData } from './createSignInData';
 export { default as hexToRGB } from './hexToRGB';
 export { default as pollSignatureStatus } from './pollSignatureStatus';
 export { buildUrl, decryptPayload, encryptPayload, setLocalStorage, removeLocalStorage } from './deeplinksUtils';
