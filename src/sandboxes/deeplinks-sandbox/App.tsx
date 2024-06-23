@@ -78,6 +78,7 @@ interface Props {
   connectedMethods: ConnectedMethods[];
   handleConnect: () => Promise<void>;
   handleBrowseDeeplink: () => Promise<void>;
+  handleSignIn: () => Promise<void>;
   logs: TLog[];
   clearLogs: () => void;
   toggleLogs: () => void;
@@ -510,6 +511,7 @@ const useProps = (): Props => {
     connectedMethods,
     handleConnect,
     handleBrowseDeeplink,
+    handleSignIn,
     logs,
     clearLogs,
     toggleLogs,
@@ -528,6 +530,7 @@ const StatelessApp = React.memo((props: Props) => {
     connectedMethods,
     handleConnect,
     handleBrowseDeeplink,
+    handleSignIn,
     logs,
     clearLogs,
     logsVisibility,
@@ -542,6 +545,7 @@ const StatelessApp = React.memo((props: Props) => {
         connectedMethods={connectedMethods}
         connect={handleConnect}
         openInPhantom={handleBrowseDeeplink}
+        signIn={handleSignIn}
         network={network}
         logsVisibility={logsVisibility}
         toggleLogs={toggleLogs}

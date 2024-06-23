@@ -226,6 +226,7 @@ interface Props {
   connectedMethods: ConnectedMethods[];
   connect: () => Promise<void>;
   openInPhantom: () => Promise<void>;
+  signIn: () => Promise<void>;
   network: string;
   logsVisibility: boolean;
   toggleLogs: () => void;
@@ -236,7 +237,7 @@ interface Props {
 // =============================================================================
 
 const Sidebar = React.memo((props: Props) => {
-  const { publicKey, connectedMethods, connect, openInPhantom, network, logsVisibility, toggleLogs } = props;
+  const { publicKey, connectedMethods, connect, openInPhantom, signIn, network, logsVisibility, toggleLogs } = props;
   const [sandboxMenuOpen, setSandboxMenuOpen] = React.useState(false);
 
   const toggleSandboxMenu = () => {
@@ -268,10 +269,7 @@ const Sidebar = React.memo((props: Props) => {
             <ToggleLogsButton onClick={toggleLogs}>{`${
               logsVisibility === true ? 'Hide' : 'Show'
             } Logs`}</ToggleLogsButton>
-            <NetworkSelectButton
-              onClick={() => null}
-              className={network === 'mainnet' ? 'selected' : ''}
-            >
+            <NetworkSelectButton onClick={() => null} className={network === 'mainnet' ? 'selected' : ''}>
               Mainnet
             </NetworkSelectButton>
           </MenuContainer>
@@ -298,6 +296,7 @@ const Sidebar = React.memo((props: Props) => {
           <>
             <Button onClick={connect}>Connect to Phantom</Button>
             <Button onClick={openInPhantom}>Open In Phantom</Button>
+            <Button onClick={signIn}>Sign In With Phantom</Button>
           </>
         )}
       </Body>
