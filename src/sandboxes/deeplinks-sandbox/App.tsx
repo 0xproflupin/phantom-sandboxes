@@ -21,6 +21,9 @@ import {
   signMessage,
   getMobileOS,
   signAndSendAllTransactions,
+  createSignInErrorData,
+  createSignInData,
+  signIn,
 } from './utils';
 
 import { DeeplinkState, Platform, TLog } from './types';
@@ -200,6 +203,38 @@ const useProps = (): Props => {
             message: JSON.stringify(error, null, 2),
           });
         }
+      } else if (path.startsWith('onSignIn')) {
+        const sharedSecretDapp = nacl.box.before(
+          bs58.decode(params.get('phantom_encryption_public_key')),
+          dappSecretkey
+        );
+
+        try {
+          const signInData = decryptPayload(params.get('data'), params.get('nonce'), sharedSecretDapp);
+
+          setLocalStorage({
+            sharedSecret: bs58.encode(sharedSecretDapp),
+            session: signInData.session,
+            phantomWalletPublicKey: signInData.public_key,
+          });
+          setDeeplinkState({
+            sharedSecret: sharedSecretDapp,
+            session: signInData.session,
+            phantomWalletPublicKey: new PublicKey(signInData.public_key),
+          });
+
+          createLog({
+            status: 'info',
+            method: 'signIn',
+            message: JSON.stringify(signInData, null, 2),
+          });
+        } catch (error) {
+          createLog({
+            status: 'error',
+            method: 'signIn',
+            message: JSON.stringify(error, null, 2),
+          });
+        }
       } else if (path.startsWith('onDisconnect')) {
         removeLocalStorage();
         resetDeeplinkState();
@@ -320,6 +355,44 @@ const useProps = (): Props => {
     window.location.href = buildUrl('connect', params, platform);
   }, [createLog, platform, setDeeplinkState]);
 
+  const handleSignIn = useCallback(async () => {
+    const kp = nacl.box.keyPair();
+    setDeeplinkState({
+      dappPubkey: kp.publicKey,
+      dappSecretkey: kp.secretKey,
+    });
+    const dappEncryptionPubkey = bs58.encode(kp.publicKey);
+    setLocalStorage({ dappPubkey: dappEncryptionPubkey, dappSecretkey: bs58.encode(kp.secretKey) });
+    const signInData = await createSignInData();
+    const params = signIn(signInData, session, sharedSecret, dappPubkey);
+
+    createLog({
+      status: 'info',
+      message: 'Signing In..',
+    });
+
+    window.location.href = buildUrl('signIn', params, platform);
+  }, [createLog, dappPubkey, platform, session, setDeeplinkState, sharedSecret]);
+
+  const handleSignInError = useCallback(async () => {
+    const kp = nacl.box.keyPair();
+    setDeeplinkState({
+      dappPubkey: kp.publicKey,
+      dappSecretkey: kp.secretKey,
+    });
+    const dappEncryptionPubkey = bs58.encode(kp.publicKey);
+    setLocalStorage({ dappPubkey: dappEncryptionPubkey, dappSecretkey: bs58.encode(kp.secretKey) });
+    const signInErrorData = await createSignInErrorData();
+    const params = signIn(signInErrorData, session, sharedSecret, dappPubkey);
+
+    createLog({
+      status: 'info',
+      message: 'Signing In..',
+    });
+
+    window.location.href = buildUrl('signIn', params, platform);
+  }, [createLog, dappPubkey, platform, session, setDeeplinkState, sharedSecret]);
+
   const handleDisconnect = useCallback(async () => {
     const url = new URL(window.location.href);
     resetDeeplinkState();
@@ -404,6 +477,14 @@ const useProps = (): Props => {
         onClick: handleSignMessage,
       },
       {
+        name: 'Sign In',
+        onClick: handleSignIn,
+      },
+      {
+        name: 'Sign In Error',
+        onClick: handleSignInError,
+      },
+      {
         name: 'Open in Phantom',
         onClick: handleBrowseDeeplink,
       },
@@ -419,6 +500,8 @@ const useProps = (): Props => {
     handleSignTransaction,
     handleSignAllTransactions,
     handleSignMessage,
+    handleSignIn,
+    handleSignInError,
     handleBrowseDeeplink,
   ]);
 

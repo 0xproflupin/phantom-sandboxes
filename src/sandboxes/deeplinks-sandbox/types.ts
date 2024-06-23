@@ -10,7 +10,8 @@ type PhantomRequestMethod =
   | 'signAndSendAllTransactions'
   | 'signTransaction'
   | 'signAllTransactions'
-  | 'signMessage';
+  | 'signMessage'
+  | 'signIn';
 
 export type Status = 'success' | 'warning' | 'error' | 'info';
 
