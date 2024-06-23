@@ -9,5 +9,4 @@ export { default as signAndSendTransaction } from './signAndSendTransaction';
 export { default as signAndSendAllTransactions } from './signAndSendAllTransactions';
 export { default as signAllTransactions } from './signAllTransactions';
 export { default as signMessage } from './signMessage';
-export { default as signIn } from './signIn';
 export { getMobileOS } from './detectPlatform';

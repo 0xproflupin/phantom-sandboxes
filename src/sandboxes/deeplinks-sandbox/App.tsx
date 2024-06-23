@@ -23,7 +23,6 @@ import {
   signAndSendAllTransactions,
   createSignInErrorData,
   createSignInData,
-  signIn,
 } from './utils';
 
 import { DeeplinkState, Platform, TLog } from './types';
@@ -357,6 +356,7 @@ const useProps = (): Props => {
   }, [createLog, platform, setDeeplinkState]);
 
   const handleSignIn = useCallback(async () => {
+    const url = new URL(window.location.href);
     const kp = nacl.box.keyPair();
     setDeeplinkState({
       dappPubkey: kp.publicKey,
@@ -365,7 +365,13 @@ const useProps = (): Props => {
     const dappEncryptionPubkey = bs58.encode(kp.publicKey);
     setLocalStorage({ dappPubkey: dappEncryptionPubkey, dappSecretkey: bs58.encode(kp.secretKey) });
     const signInData = await createSignInData();
-    const params = signIn(signInData, session, sharedSecret, dappPubkey);
+    const params = new URLSearchParams({
+      dapp_encryption_public_key: dappEncryptionPubkey,
+      cluster: 'mainnet-beta',
+      app_url: 'https://phantom.app',
+      redirect_link: `${url.protocol}//${url.hostname}${url.pathname}#onConnect`,
+      payload: bs58.encode(Buffer.from(JSON.stringify(signInData))),
+    });
 
     createLog({
       status: 'info',
@@ -373,9 +379,10 @@ const useProps = (): Props => {
     });
 
     window.location.href = buildUrl('signIn', params, platform);
-  }, [createLog, dappPubkey, platform, session, setDeeplinkState, sharedSecret]);
+  }, [createLog, platform, setDeeplinkState]);
 
   const handleSignInError = useCallback(async () => {
+    const url = new URL(window.location.href);
     const kp = nacl.box.keyPair();
     setDeeplinkState({
       dappPubkey: kp.publicKey,
@@ -384,7 +391,13 @@ const useProps = (): Props => {
     const dappEncryptionPubkey = bs58.encode(kp.publicKey);
     setLocalStorage({ dappPubkey: dappEncryptionPubkey, dappSecretkey: bs58.encode(kp.secretKey) });
     const signInErrorData = await createSignInErrorData();
-    const params = signIn(signInErrorData, session, sharedSecret, dappPubkey);
+    const params = new URLSearchParams({
+      dapp_encryption_public_key: dappEncryptionPubkey,
+      cluster: 'mainnet-beta',
+      app_url: 'https://phantom.app',
+      redirect_link: `${url.protocol}//${url.hostname}${url.pathname}#onConnect`,
+      payload: bs58.encode(Buffer.from(JSON.stringify(signInErrorData))),
+    });
 
     createLog({
       status: 'info',
@@ -392,7 +405,7 @@ const useProps = (): Props => {
     });
 
     window.location.href = buildUrl('signIn', params, platform);
-  }, [createLog, dappPubkey, platform, session, setDeeplinkState, sharedSecret]);
+  }, [createLog, platform, setDeeplinkState]);
 
   const handleDisconnect = useCallback(async () => {
     const url = new URL(window.location.href);
