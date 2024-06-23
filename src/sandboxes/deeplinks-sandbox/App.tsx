@@ -211,7 +211,21 @@ const useProps = (): Props => {
 
         try {
           const signInData = decryptPayload(params.get('data'), params.get('nonce'), sharedSecretDapp);
-
+          createLog({
+            status: 'info',
+            method: 'signIn',
+            message: JSON.stringify(signInData, null, 2),
+          });
+          createLog({
+            status: 'info',
+            method: 'signIn',
+            message: JSON.stringify(params.get('data'), null, 2),
+          });
+          createLog({
+            status: 'info',
+            method: 'signIn',
+            message: JSON.stringify(params.get('nonce'), null, 2),
+          });
           setLocalStorage({
             sharedSecret: bs58.encode(sharedSecretDapp),
             session: signInData.session,
