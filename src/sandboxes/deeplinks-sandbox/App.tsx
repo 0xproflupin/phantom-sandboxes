@@ -369,7 +369,7 @@ const useProps = (): Props => {
       dapp_encryption_public_key: dappEncryptionPubkey,
       cluster: 'mainnet-beta',
       app_url: 'https://phantom.app',
-      redirect_link: `${url.protocol}//${url.hostname}${url.pathname}#onConnect`,
+      redirect_link: `${url.protocol}//${url.hostname}${url.pathname}#onSignIn`,
       payload: bs58.encode(Buffer.from(JSON.stringify(signInData))),
     });
 
@@ -395,7 +395,7 @@ const useProps = (): Props => {
       dapp_encryption_public_key: dappEncryptionPubkey,
       cluster: 'mainnet-beta',
       app_url: 'https://phantom.app',
-      redirect_link: `${url.protocol}//${url.hostname}${url.pathname}#onConnect`,
+      redirect_link: `${url.protocol}//${url.hostname}${url.pathname}#onSignIn`,
       payload: bs58.encode(Buffer.from(JSON.stringify(signInErrorData))),
     });
 
